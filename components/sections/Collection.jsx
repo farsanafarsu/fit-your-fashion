@@ -31,6 +31,8 @@ export default function Collection() {
   }, []);
 
   return (
+    <div>
+      {/* own wrapper: GSAP inserts its pin-spacer here, outside React's sibling list */}
     <section id="collection" ref={root} className="relative overflow-hidden bg-pearl py-24 md:flex md:h-screen md:items-center md:py-0" aria-labelledby="col-h">
       <div ref={track} className="no-scrollbar flex snap-x snap-mandatory scroll-px-[var(--gutter)] items-center gap-5 overflow-x-auto overscroll-x-contain px-[var(--gutter)] sm:gap-6 md:snap-none md:gap-[5vw] md:overflow-visible">
         <div className="w-[84vw] shrink-0 snap-start sm:w-[60vw] md:w-[44vw] lg:w-[34vw]">
@@ -60,5 +62,6 @@ export default function Collection() {
         <div className="c-progress h-full origin-left scale-x-0 bg-amethyst" />
       </div>
     </section>
+    </div>
   );
 }

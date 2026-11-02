@@ -36,6 +36,8 @@ export default function Craft() {
 
   const gown = byId("aurora-gown");
   return (
+    <div>
+      {/* own wrapper: GSAP inserts its pin-spacer here, outside React's sibling list */}
     <section id="story" ref={root} className="on-dark relative h-screen overflow-hidden bg-plum motion-reduce:h-auto motion-reduce:py-32 text-pearl" aria-labelledby="cr-h">
       {/* background set */}
       <div className="cr-bg absolute inset-[-10%] bg-[radial-gradient(ellipse_at_30%_40%,#3a2b5c,transparent_60%),radial-gradient(ellipse_at_80%_70%,#2a1f44,#1e1530)]" aria-hidden>
@@ -74,5 +76,6 @@ export default function Craft() {
         </div>
       </div>
     </section>
+    </div>
   );
 }

@@ -3,6 +3,8 @@ import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { gsap } from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { useLenis } from "../SmoothScroll";
 import { Button, Spark } from "../ui/primitives";
 
 // Editorial cut-out carousel: giant serif type sits behind two models per look; looks slide
@@ -38,6 +40,7 @@ const LOOKS = [
   },
 ];
 const AUTOPLAY_MS = 6500;
+const SCROLL_PER_LOOK = 0.85; // viewport heights of scrolling spent on each look while the hero is pinned
 const ease = [0.22, 1, 0.36, 1];
 
 function Model({ m, role, dir, priority }) {
@@ -76,28 +79,76 @@ export default function Hero({ ready }) {
   const [dir, setDir] = useState(1);
   const [playing, setPlaying] = useState(true);
   const [hover, setHover] = useState(false);
+  const [pinned, setPinned] = useState(false); // scroll drives the looks (motion allowed)
+  const [progress, setProgress] = useState(0); // progress within the current look's scroll stretch
   const touch = useRef(null);
+  const pin = useRef(null);
+  const idx = useRef(0);
+  const lenis = useLenis();
   const look = LOOKS[i];
 
-  const go = useCallback((d) => {
-    setDir(d);
-    setI((x) => (x + d + LOOKS.length) % LOOKS.length);
-  }, []);
-  const goTo = (n) => {
-    if (n === i) return;
-    setDir(n > i ? 1 : -1);
+  const show = useCallback((n) => {
+    if (n === idx.current) return;
+    setDir(n > idx.current ? 1 : -1);
+    idx.current = n;
     setI(n);
-  };
+  }, []);
 
-  // Autoplay (off for reduced motion; pauses on hover and when the tab is hidden).
+  // While pinned, controls scroll to the look's stretch so the page and the carousel never disagree.
+  const goTo = useCallback(
+    (n) => {
+      const st = pin.current;
+      if (!st) return show((n + LOOKS.length) % LOOKS.length);
+      const clamped = Math.max(0, Math.min(LOOKS.length, n)); // n === length → continue past the hero
+      // land just inside the look's stretch (the very top for the first look, past the pin for "next" on the last)
+      const at = clamped > 0 && clamped < LOOKS.length ? clamped + 0.12 : clamped;
+      const y = st.start + ((st.end - st.start) * at) / LOOKS.length;
+      if (lenis) lenis.scrollTo(y, { duration: 1.2 });
+      else window.scrollTo({ top: y, behavior: "smooth" });
+    },
+    [lenis, show]
+  );
+  const go = useCallback((d) => goTo(idx.current + d), [goTo]);
+
+  // Pin the hero and map scroll to looks. Created on mount (before later pinned sections) so their
+  // start positions account for this pin's spacer.
+  useEffect(() => {
+    const mm = gsap.matchMedia();
+    mm.add("(prefers-reduced-motion: no-preference)", () => {
+      const st = ScrollTrigger.create({
+        trigger: root.current,
+        start: "top top",
+        end: () => "+=" + window.innerHeight * SCROLL_PER_LOOK * LOOKS.length,
+        pin: true,
+        pinSpacing: true,
+        anticipatePin: 1,
+        invalidateOnRefresh: true,
+        onUpdate: (self) => {
+          const raw = self.progress * LOOKS.length;
+          show(Math.min(LOOKS.length - 1, Math.floor(raw)));
+          setProgress(Math.min(1, raw - Math.min(LOOKS.length - 1, Math.floor(raw))));
+        },
+      });
+      pin.current = st;
+      setPinned(true);
+      return () => {
+        pin.current = null;
+        setPinned(false);
+        st.kill();
+      };
+    });
+    return () => mm.revert();
+  }, [show]);
+
+  // Autoplay only when scroll isn't driving the looks (reduced motion turns both off).
   useEffect(() => {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) setPlaying(false);
   }, []);
   useEffect(() => {
-    if (!ready || !playing || hover) return;
+    if (pinned || !ready || !playing || hover) return;
     const t = setTimeout(() => go(1), AUTOPLAY_MS);
     return () => clearTimeout(t);
-  }, [i, ready, playing, hover, go]);
+  }, [i, ready, playing, hover, go, pinned]);
 
   // Keyboard arrows while the hero has focus.
   const onKey = (e) => {
@@ -120,8 +171,6 @@ export default function Hero({ ready }) {
           .fromTo(".h-arrive", { opacity: 0, y: 80 }, { opacity: 1, y: 0, duration: 1.6, ease: "expo.out" }, 0.15)
           .fromTo(".h-fade", { opacity: 0, y: 18 }, { opacity: 1, y: 0, duration: 1, ease: "expo.out", stagger: 0.08 }, 0.6);
 
-        gsap.to(".h-type", { yPercent: -18, ease: "none", scrollTrigger: { trigger: root.current, start: "top top", end: "bottom top", scrub: true } });
-        gsap.to(".h-stage", { scale: 1.08, yPercent: 6, ease: "none", scrollTrigger: { trigger: root.current, start: "top top", end: "bottom top", scrub: true } });
 
         if (window.matchMedia("(pointer: fine)").matches) {
           const layers = [[".h-type", -10], [".h-back", 14], [".h-front", 26]].map(([s, k]) => ({
@@ -142,8 +191,11 @@ export default function Hero({ ready }) {
   }, [ready]);
 
   return (
+    <div>
+      {/* own wrapper: GSAP inserts its pin-spacer here, outside React's sibling list */}
     <section
       ref={root}
+      data-hero
       className="relative h-[100svh] min-h-[620px] overflow-hidden text-plum transition-colors duration-[1400ms]"
       style={{ background: `radial-gradient(120% 90% at 60% 40%, #FFFFFF 0%, ${look.tint} 55%, #D9CCEE 100%)` }}
       aria-roledescription="carousel"
@@ -257,20 +309,31 @@ export default function Hero({ ready }) {
                 {LOOKS.map((l, n) => (
                   <button key={l.id} role="tab" aria-selected={n === i} aria-label={l.name} onClick={() => goTo(n)} className="group grid h-11 w-9 place-items-center">
                     <span className="relative h-[3px] w-full overflow-hidden rounded-full bg-plum/15">
-                      {n === i && (
-                        <span
-                          key={`${i}-${playing && !hover}`}
-                          className="absolute inset-y-0 left-0 rounded-full bg-amethyst"
-                          style={{ width: playing && !hover ? undefined : "100%", animation: playing && !hover ? `hero-progress ${AUTOPLAY_MS}ms linear forwards` : "none" }}
-                        />
+                      {pinned ? (
+                        // scroll-driven: bars fill as you scroll through each look
+                        <span className="absolute inset-y-0 left-0 rounded-full bg-amethyst" style={{ width: n < i ? "100%" : n === i ? `${Math.max(8, progress * 100)}%` : "0%" }} />
+                      ) : (
+                        n === i && (
+                          <span
+                            key={`${i}-${playing && !hover}`}
+                            className="absolute inset-y-0 left-0 rounded-full bg-amethyst"
+                            style={{ width: playing && !hover ? undefined : "100%", animation: playing && !hover ? `hero-progress ${AUTOPLAY_MS}ms linear forwards` : "none" }}
+                          />
+                        )
                       )}
                     </span>
                   </button>
                 ))}
               </div>
-              <button onClick={() => setPlaying(!playing)} aria-label={playing ? "Pause slideshow" : "Play slideshow"} className="grid h-11 w-11 place-items-center rounded-full text-[11px] text-plum/70 hover:bg-white/60">
-                {playing ? "❚❚" : "▶"}
-              </button>
+              {pinned ? (
+                <span className="label-sm hidden items-center gap-2 px-2 text-plum/60 lg:flex" aria-hidden>
+                  Scroll <span className="block h-6 w-px animate-pulse bg-plum/40" />
+                </span>
+              ) : (
+                <button onClick={() => setPlaying(!playing)} aria-label={playing ? "Pause slideshow" : "Play slideshow"} className="grid h-11 w-11 place-items-center rounded-full text-[11px] text-plum/70 hover:bg-white/60">
+                  {playing ? "❚❚" : "▶"}
+                </button>
+              )}
               <button onClick={() => go(-1)} aria-label="Previous look" className="grid h-12 w-12 place-items-center rounded-full border border-plum/20 bg-white/50 backdrop-blur transition hover:bg-plum hover:text-pearl" data-cursor="Prev">
                 <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden><path d="M15 5l-7 7 7 7" /></svg>
               </button>
@@ -286,5 +349,6 @@ export default function Hero({ ready }) {
         Placeholder · Unsplash stock models
       </span>
     </section>
+    </div>
   );
 }

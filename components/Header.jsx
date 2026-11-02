@@ -31,7 +31,9 @@ export default function Header() {
       const y = window.scrollY;
       setHidden(y > 120 && y > last.current);
       setSolid(y > 40);
-      setPastHero(y > window.innerHeight * 0.7);
+      // the hero is pinned while its looks play, so measure where it actually is rather than scroll distance
+      const hero = document.querySelector("[data-hero]");
+      setPastHero(!hero || hero.getBoundingClientRect().bottom < window.innerHeight * 0.3);
       last.current = y;
     };
     window.addEventListener("scroll", onScroll, { passive: true });

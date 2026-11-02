@@ -5,6 +5,8 @@ import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 gsap.registerPlugin(ScrollTrigger);
+// Phone address bars resize the viewport while scrolling; don't re-measure pins for that.
+ScrollTrigger.config({ ignoreMobileResize: true });
 
 const LenisCtx = createContext(null);
 export const useLenis = () => useContext(LenisCtx);
