@@ -6,6 +6,7 @@ import { gsap } from "gsap";
 import { byId, PRODUCTS } from "@/lib/catalog";
 import ProductCard from "../ProductCard";
 import SilkFilm from "../ui/SilkFilm";
+import Dial from "../ui/Dial";
 import { ChapterLabel, Spark } from "../ui/primitives";
 
 // Chapter 01: a continuous editorial strip. On desktop it is pinned and travels sideways with
@@ -121,9 +122,26 @@ function EndCTA() {
   );
 }
 
+// Per-letter spans for the entrance; the word itself stays readable to screen readers via the h2 label.
+const Letters = ({ text }) =>
+  text.split("").map((c, i) => (
+    <span key={i} className="c-char inline-block will-change-transform" aria-hidden>
+      {c}
+    </span>
+  ));
+
+const FACTS = [
+  ["Season", "01"],
+  ["Pieces", String(PRODUCTS.length).padStart(2, "0")],
+  ["Made", "By hand"],
+  ["Fabrics", "Silk · Organza · Wool"],
+];
+
 export default function Collection() {
   const root = useRef(null);
   const track = useRef(null);
+  const dial = useRef(null); // docked dial (desktop, pinned)
+  const dialFlow = useRef(null); // in-flow dial (phones, reduced motion)
 
   useEffect(() => {
     const ctx = gsap.context(() => {
@@ -144,6 +162,7 @@ export default function Collection() {
             pin: true,
             anticipatePin: 1,
             onUpdate: (self) => {
+              dial.current?.setProgress(self.progress);
               const s = clamp(self.getVelocity() / -320);
               if (Math.abs(s) > Math.abs(proxy.s)) {
                 proxy.s = s;
@@ -152,6 +171,22 @@ export default function Collection() {
             },
           },
         });
+
+        // The dial starts large beside the title, then shrinks into the bottom-right corner and keeps
+        // time for the rest of the journey (it replaces a progress bar).
+        const d = root.current.querySelector(".c-dial");
+        gsap.fromTo(
+          d,
+          { scale: 1, y: 0 },
+          {
+            scale: () => (window.innerWidth < 1024 ? 0.34 : 0.27),
+            y: () => window.innerHeight / 2 - d.offsetHeight / 2 - 22,
+            ease: "power2.inOut",
+            scrollTrigger: { trigger: root.current, start: "top top", end: () => "+=" + window.innerWidth * 0.75, scrub: 1, invalidateOnRefresh: true },
+          }
+        );
+        // the title block leaves a touch faster than the strip, so the opener "lifts off"
+        gsap.to(".c-opener-copy", { xPercent: -14, opacity: 0.2, ease: "none", scrollTrigger: { trigger: root.current, start: "top top", end: () => "+=" + window.innerWidth * 0.8, scrub: true } });
 
         // Giant outline type drifts at a third of the strip's speed.
         gsap.to(".c-bg", { x: () => -dist() * 0.35, ease: "none", scrollTrigger: st });
@@ -167,8 +202,25 @@ export default function Collection() {
           if (px) gsap.fromTo(px, { xPercent: 8 }, { xPercent: -8, ease: "none", scrollTrigger: { trigger: el, containerAnimation: tween, start: "left right", end: "right left", scrub: true } });
         });
       });
+
+      // Opener entrance (every size): letters rise in, "Lavender" unmasks, the dial turns in.
+      mm.add("(prefers-reduced-motion: no-preference)", () => {
+        const tl = gsap.timeline({ scrollTrigger: { trigger: root.current, start: "top 72%", once: true } });
+        tl.from(".c-char", { yPercent: 118, rotate: 7, opacity: 0, duration: 1.3, ease: "expo.out", stagger: 0.035 })
+          .from(".c-word", { clipPath: "inset(0 100% 0 0)", duration: 1.6, ease: "expo.inOut" }, 0.15)
+          .from(".c-fact", { y: 24, opacity: 0, duration: 0.9, ease: "expo.out", stagger: 0.07 }, 0.5)
+          .from(".c-dial-in", { opacity: 0, rotate: -40, scale: 0.86, duration: 1.8, ease: "expo.out" }, 0.1);
+      });
     }, root);
-    return () => ctx.revert();
+
+    // Phones / reduced motion: the in-flow dial follows the swipe row instead.
+    const t = track.current;
+    const onSwipe = () => dialFlow.current?.setProgress(t.scrollLeft / Math.max(1, t.scrollWidth - t.clientWidth));
+    t.addEventListener("scroll", onSwipe, { passive: true });
+    return () => {
+      t.removeEventListener("scroll", onSwipe);
+      ctx.revert();
+    };
   }, []);
 
   return (
@@ -176,8 +228,8 @@ export default function Collection() {
       {/* own wrapper: GSAP inserts its pin-spacer here, outside React's sibling list */}
       <section id="collection" ref={root} data-chapter="#FAF8FD" className="relative overflow-hidden py-20 md:flex md:h-screen md:items-center md:py-0" aria-labelledby="col-h">
         {/* drifting outline type behind the strip (CSS marquee on touch, scroll-linked on desktop) */}
-        <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center overflow-visible" aria-hidden>
-          <div className="c-bg flex whitespace-nowrap max-md:animate-[pan_50s_linear_infinite] motion-reduce:animate-none">
+        <div className="pointer-events-none absolute inset-y-0 left-0 hidden items-center overflow-visible md:flex" aria-hidden>
+          <div className="c-bg flex whitespace-nowrap pl-[100vw]">
             {[0, 1].map((k) => (
               <span key={k} className="display pr-[6vw] text-[44vw] leading-none text-transparent md:text-[26vw]" style={{ WebkitTextStroke: "1px rgba(110,79,168,.16)" }}>
                 The Lavender Hour — Season 01 —
@@ -186,19 +238,45 @@ export default function Collection() {
           </div>
         </div>
 
+        <div className="c-dial pointer-events-none absolute right-[var(--gutter)] top-1/2 z-20 hidden w-[min(40vw,66svh)] origin-bottom-right -translate-y-1/2 md:motion-safe:block">
+          <Dial ref={dial} idPrefix="dd" className="c-dial-in" />
+        </div>
+
         <div ref={track} className="no-scrollbar relative flex snap-x snap-mandatory scroll-px-[var(--gutter)] items-center gap-6 overflow-x-auto overscroll-x-contain px-[var(--gutter)] pb-6 sm:gap-8 md:h-full md:gap-[5vw] md:pb-0 md:motion-safe:snap-none md:motion-safe:overflow-visible" /* reduced motion: stays a swipe row, no pin */>
-          <div className="w-[84vw] shrink-0 snap-start sm:w-[60vw] md:w-[44vw] lg:w-[34vw]">
-            <ChapterLabel n="01" title="The Collection" />
-            <h2 id="col-h" className="display mt-8 text-[17vw] sm:text-[12vw] md:text-[10vw] lg:text-[9vw]">
-              The <span className="display-i text-amethyst">Lavender</span> Hour
-            </h2>
-            <p className="mt-6 max-w-sm text-[15px] leading-relaxed text-ink-soft">
-              {PRODUCTS.length} pieces cut for the minute between dusk and night. Silks that move like breath; tailoring with a pulse.
-            </p>
-            <p className="label-sm mt-8 hidden items-center gap-3 text-plum/50 md:flex">
-              Scroll to travel <span className="inline-block h-px w-10 bg-plum/30" /> →
-            </p>
-            <p className="label-sm mt-8 text-plum/50 md:hidden">Swipe →</p>
+          {/* Opener: full first screen on desktop (title left, dial right — the docked dial lives outside the track) */}
+          <div className="c-opener relative w-[86vw] shrink-0 snap-start sm:w-[72vw] md:w-[calc(100vw-var(--gutter)*2)] md:motion-safe:pr-[min(44vw,74svh)]">
+            <div className="c-opener-copy max-w-[760px]">
+              <ChapterLabel n="01" title="The Collection" />
+              <h2 id="col-h" aria-label="The Lavender Hour" className="display mt-6 text-[19vw] leading-[0.84] sm:text-[14vw] md:mt-8 md:text-[min(10.5vw,17svh)]">
+                <span className="block overflow-hidden pb-[0.04em]"><Letters text="The" /></span>
+                <span className="block overflow-hidden pb-[0.12em] pl-[0.35em]">
+                  <span className="c-word lav-fill display-i inline-block pr-[0.06em]" aria-hidden>Lavender</span>
+                </span>
+                <span className="block overflow-hidden pb-[0.04em]"><Letters text="Hour" /></span>
+              </h2>
+              <p className="c-fact mt-7 max-w-md text-[15px] leading-relaxed text-ink-soft md:text-[16px]">
+                Cut for the minute between dusk and night. Silks that move like breath; tailoring with a pulse. Travel the collection and watch the hour turn.
+              </p>
+              <dl className="mt-8 grid max-w-xl grid-cols-3 border-t border-plum/10 sm:grid-cols-[0.6fr_0.6fr_0.9fr_1.7fr]">
+                {FACTS.map(([k, v]) => (
+                  <div key={k} className={`c-fact border-b border-plum/10 py-4 pr-4 sm:border-b-0 ${k === "Fabrics" ? "col-span-3 sm:col-span-1" : ""}`}>
+                    <dt className="label-sm text-plum/50">{k}</dt>
+                    <dd className="display mt-1.5 whitespace-nowrap text-[19px] leading-tight sm:text-[21px]">{v}</dd>
+                  </div>
+                ))}
+              </dl>
+              <p className="c-fact label-sm mt-8 hidden items-center gap-3 text-plum/50 md:motion-safe:flex">
+                Scroll to travel the hour
+                <span className="relative inline-block h-px w-14 overflow-hidden bg-plum/20">
+                  <span className="absolute inset-y-0 left-0 w-1/2 bg-amethyst motion-safe:animate-[cue_1.8s_ease-in-out_infinite]" />
+                </span>
+              </p>
+              <p className="label-sm mt-8 text-plum/50 md:motion-safe:hidden">Swipe to travel the hour →</p>
+            </div>
+            {/* in-flow dial: phones and reduced motion */}
+            <div className="mt-10 md:motion-safe:hidden">
+              <Dial ref={dialFlow} idPrefix="dm" className="c-dial-in mx-auto w-[min(78vw,420px)]" />
+            </div>
           </div>
 
           <Arch src="/models/ivory-coat.webp" w={611} h={1500} look="01" name="Ivory Tailoring" align="bottom" />

@@ -116,6 +116,12 @@ html[data-mood="bridal"] .ambience { background: radial-gradient(circle at 50% 4
   background: linear-gradient(100deg, rgba(233, 223, 245, 0.35) 30%, rgba(255, 255, 255, 0.9) 50%, rgba(233, 223, 245, 0.35) 70%);
   background-size: 300% 100%; animation: shimmer 1.6s var(--ease-curtain) infinite;
 }
+/* Slow iridescent fill for hero words (e.g. "Lavender"). */
+.lav-fill {
+  background: linear-gradient(100deg, #6E4FA8 0%, #B9A3DB 22%, #6E4FA8 45%, #9C7FD0 70%, #6E4FA8 100%);
+  background-size: 200% 100%; -webkit-background-clip: text; background-clip: text; color: transparent;
+  animation: lav-pan 9s linear infinite;
+}
 .iris-text { background: var(--iris); background-size: 200% 200%; -webkit-background-clip: text; background-clip: text; color: transparent; animation: iris 8s linear infinite; }
 @keyframes iris { to { background-position: 200% 200%; } }
 @keyframes shimmer { from { background-position: 100% 0; } to { background-position: -200% 0; } }
@@ -126,6 +132,8 @@ html[data-mood="bridal"] .ambience { background: radial-gradient(circle at 50% 4
 @keyframes float-y { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
 @keyframes pan { from { transform: translateX(0); } to { transform: translateX(-50%); } }
 @keyframes hero-progress { from { width: 0%; } to { width: 100%; } }
+@keyframes cue { 0% { transform: translateX(-100%); } 100% { transform: translateX(200%); } }
+@keyframes lav-pan { to { background-position: -200% 0; } }
 
 .no-scrollbar { scrollbar-width: none; }
 .no-scrollbar::-webkit-scrollbar { display: none; }
