@@ -1,0 +1,38 @@
+"use client";
+import { useState } from "react";
+import Intro from "./Intro";
+import Reveals from "./Reveals";
+import Hero from "./sections/Hero";
+import Collection from "./sections/Collection";
+import DressingChapter from "./sections/DressingChapter";
+import StylistChapter from "./sections/StylistChapter";
+import Atelier from "./sections/Atelier";
+import Moods from "./sections/Moods";
+import ShopTheFilm from "./sections/ShopTheFilm";
+import PickedForYou from "./sections/PickedForYou";
+import Craft from "./sections/Craft";
+import { UGCWall, Newsletter, Footer } from "./sections/Closing";
+
+export default function Home() {
+  const [ready, setReady] = useState(false);
+  return (
+    <>
+      <Intro onDone={() => setReady(true)} />
+      <main id="main">
+        <Hero ready={ready} />
+        <Collection />
+        <DressingChapter />
+        <StylistChapter />
+        <Atelier />
+        <Moods />
+        <ShopTheFilm />
+        <PickedForYou />
+        <Craft />
+        <UGCWall />
+        <Newsletter />
+      </main>
+      <Footer />
+      <Reveals />
+    </>
+  );
+}
