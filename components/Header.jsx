@@ -33,7 +33,7 @@ export default function Header() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  const iconBtn = "relative grid h-10 w-10 place-items-center rounded-full transition-colors hover:bg-white/60";
+  const iconBtn = "relative grid h-11 w-11 place-items-center sm:h-10 sm:w-10 rounded-full transition-colors hover:bg-white/60";
   return (
     <>
     <header
@@ -49,7 +49,7 @@ export default function Header() {
             </Link>
           ))}
         </nav>
-        <Link href="/" className="display whitespace-nowrap text-[17px] tracking-[0.06em] sm:text-[22px] sm:tracking-[0.16em] xl:absolute xl:left-1/2 xl:-translate-x-1/2" aria-label="Fit Your Fashion home">
+        <Link href="/" className="display whitespace-nowrap py-3 text-[17px] tracking-[0.06em] sm:text-[22px] sm:tracking-[0.16em] xl:absolute xl:left-1/2 xl:-translate-x-1/2" aria-label="Fit Your Fashion home">
           FIT YOUR FASHION
         </Link>
         <div className="flex items-center gap-0.5 sm:gap-1">
@@ -72,7 +72,7 @@ export default function Header() {
           </button>
           <button className={iconBtn} onClick={() => setPanel("bag")} aria-label={`Bag, ${bag.length} items`}>
             <Svg k="bag" />
-            {bag.length > 0 && <span className="absolute -right-0.5 -top-0.5 grid h-4 min-w-4 place-items-center rounded-full bg-plum px-1 text-[9px] text-pearl">{bag.length}</span>}
+            {bag.length > 0 && <span className="absolute -right-0.5 -top-0.5 grid h-4 min-w-4 place-items-center rounded-full bg-plum px-1 text-[10px] text-pearl">{bag.length}</span>}
           </button>
         </div>
       </div>
@@ -80,7 +80,7 @@ export default function Header() {
     {/* Mobile: stylist is a floating button that opens a bottom sheet (outside the header's transform) */}
       <button
         onClick={() => setPanel("stylist")}
-        className="ai-glow label-sm fixed bottom-5 right-4 z-[90] inline-flex items-center gap-2 rounded-full bg-pearl/90 px-5 py-3.5 text-plum shadow-xl backdrop-blur md:hidden"
+        className="ai-glow label-sm fixed bottom-[max(1.25rem,env(safe-area-inset-bottom))] right-4 z-[90] inline-flex items-center gap-2 rounded-full bg-pearl/90 px-5 py-3.5 text-plum shadow-xl backdrop-blur md:hidden"
       >
         <Spark className="h-4 w-4" /> Stylist
       </button>

@@ -137,7 +137,7 @@ function OccasionWeather() {
   const [occ, setOcc] = useState("moonlit");
   const [weather, setWeather] = useState("warm");
   const ids = PRODUCTS.filter((p) => p.moods.includes(occ) && p.season.includes(weather)).slice(0, 3).map((p) => p.id);
-  const sel = "rounded-full border border-plum/15 bg-white/70 px-3 py-2 text-[13px]";
+  const sel = "min-h-11 rounded-full border border-plum/15 bg-white/70 px-4 py-2.5 text-[13px]";
   return (
     <div>
       <div className="flex flex-wrap gap-2">
@@ -165,8 +165,8 @@ function SmartWardrobe() {
     <div>
       <form onSubmit={(e) => { e.preventDefault(); if (text.trim()) setItems([...items, text.trim()]); setText(""); }} className="flex gap-2">
         <label className="sr-only" htmlFor="wd">Add something you own</label>
-        <input id="wd" value={text} onChange={(e) => setText(e.target.value)} placeholder="e.g. black wide jeans" className="min-w-0 flex-1 rounded-full border border-plum/15 bg-white/70 px-4 py-2.5 text-[13px] outline-none" />
-        <button className="label-sm rounded-full bg-plum px-4 text-pearl">Add</button>
+        <input id="wd" value={text} onChange={(e) => setText(e.target.value)} placeholder="e.g. black wide jeans" className="min-h-11 min-w-0 flex-1 rounded-full border border-plum/15 bg-white/70 px-4 py-2.5 text-[13px] outline-none" />
+        <button className="label-sm min-h-11 rounded-full bg-plum px-5 text-pearl">Add</button>
       </form>
       <div className="mt-3 flex flex-wrap gap-1.5">{items.map((t, i) => <span key={i} className="rounded-full bg-mist px-3 py-1 text-[12px]">{t}</span>)}</div>
       {items.length > 0 && (sugg.length ? <Result ids={sugg} note="New pieces that work with what you own:" /> : <p className="mt-3 text-[13px] text-ink-soft">Add a colour or garment type (black, white, denim, saree…) and I’ll match it.</p>)}
@@ -180,13 +180,13 @@ function CampaignMode() {
   const [id, setId] = useState("aurora-gown");
   return (
     <div>
-      <div className="flex items-center gap-2" role="radiogroup" aria-label="Skin tone">
+      <div className="flex flex-wrap items-center gap-3" role="radiogroup" aria-label="Skin tone">
         {SKIN.map((c) => (
-          <button key={c} role="radio" aria-checked={body.skin === c} aria-label={`Skin tone ${c}`} onClick={() => setBody({ ...body, skin: c })} className={`h-7 w-7 rounded-full ring-offset-2 ${body.skin === c ? "ring-2 ring-amethyst" : ""}`} style={{ background: c }} />
+          <button key={c} role="radio" aria-checked={body.skin === c} aria-label={`Skin tone ${c}`} onClick={() => setBody({ ...body, skin: c })} className={`h-11 w-11 rounded-full ring-offset-2 sm:h-9 sm:w-9 ${body.skin === c ? "ring-2 ring-amethyst" : ""}`} style={{ background: c }} />
         ))}
       </div>
       <label className="sr-only" htmlFor="cm-p">Piece</label>
-      <select id="cm-p" value={id} onChange={(e) => setId(e.target.value)} className="mt-3 w-full rounded-full border border-plum/15 bg-white/70 px-3 py-2 text-[13px]">
+      <select id="cm-p" value={id} onChange={(e) => setId(e.target.value)} className="mt-3 min-h-11 w-full rounded-full border border-plum/15 bg-white/70 px-4 py-2.5 text-[13px]">
         {PRODUCTS.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}
       </select>
       <Link href={`/dressing-room?look=${id}&campaign=1`} className="label-sm mt-4 flex items-center justify-center gap-2 rounded-full bg-plum py-3 text-pearl" data-cursor="Render">
@@ -214,23 +214,26 @@ export default function Atelier() {
         <div className="flex flex-col justify-between gap-6 md:flex-row md:items-end">
           <div>
             <p className="label flex items-center gap-2 text-amethyst"><Spark className="h-3.5 w-3.5" /> The AI Atelier</p>
-            <h2 id="at-h" className="display mt-6 text-[13vw] md:text-[5.5vw]">An intelligence <span className="display-i">with taste.</span></h2>
+            <h2 id="at-h" className="display mt-6 text-[13vw] sm:text-[9vw] lg:text-[5.5vw]">An intelligence <span className="display-i">with taste.</span></h2>
           </div>
           <p className="max-w-sm text-[13px] leading-relaxed text-ink-soft">
             <strong className="font-medium text-plum">Privacy first.</strong> Photos are processed on your device in this prototype and never uploaded. In production, images are encrypted in transit, used only for your request, and can be deleted from your account at any time.
           </p>
         </div>
-        <div className="mt-14 grid gap-6 lg:grid-cols-[1fr_1.2fr]">
-          <div className="grid gap-2" role="tablist" aria-label="AI tools">
+        <div className="mt-10 grid grid-cols-1 gap-4 *:min-w-0 md:mt-14 lg:grid-cols-[1fr_1.2fr] lg:gap-6">
+          {/* Phones/tablets: swipeable chips. Desktop: a vertical index. */}
+          <div className="no-scrollbar -mx-[var(--gutter)] flex snap-x gap-2 overflow-x-auto px-[var(--gutter)] pb-1 lg:mx-0 lg:grid lg:overflow-visible lg:px-0" role="tablist" aria-label="AI tools">
             {TOOLS.map((t) => (
-              <button key={t.id} role="tab" aria-selected={tool === t.id} onClick={() => setTool(t.id)} className={`group flex items-baseline justify-between rounded-2xl px-6 py-5 text-left transition-colors ${tool === t.id ? "ai-glow bg-white" : "hover:bg-white/60"}`}>
-                <span className="display text-[26px] md:text-[32px]">{t.name}</span>
-                <span className="hidden max-w-[45%] text-right text-[13px] text-ink-soft sm:block lg:hidden xl:block">{t.line}</span>
+              <button key={t.id} role="tab" aria-selected={tool === t.id} onClick={() => setTool(t.id)} className={`group flex shrink-0 snap-start items-baseline justify-between rounded-full px-5 py-3 text-left transition-colors lg:rounded-2xl lg:px-6 lg:py-5 ${tool === t.id ? "ai-glow bg-white" : "bg-white/40 hover:bg-white/60 lg:bg-transparent"}`}>
+                <span className="display whitespace-nowrap text-[20px] lg:text-[32px]">{t.name}</span>
+                <span className="hidden max-w-[45%] text-right text-[13px] text-ink-soft xl:block">{t.line}</span>
               </button>
             ))}
           </div>
-          <div className="rounded-[28px] bg-mist/60 p-6 md:p-10" role="tabpanel" aria-label={T.name}>
-            <p className="label mb-5 text-amethyst">{T.name}</p>
+          <div className="rounded-[24px] bg-mist/60 p-5 sm:p-8 md:rounded-[28px] md:p-10" role="tabpanel" aria-label={T.name}>
+            <p className="label text-amethyst">{T.name}</p>
+            <p className="mb-5 mt-1.5 text-[13px] text-ink-soft xl:hidden">{T.line}</p>
+            <div className="hidden xl:block xl:h-5" />
             <T.C />
           </div>
         </div>

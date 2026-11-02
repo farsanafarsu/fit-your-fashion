@@ -57,7 +57,7 @@ export default function GarmentArt({ product, angle = 0, className = "", bg = "l
           )}
         </g>
       </svg>
-      {tag && <span className="label-sm absolute bottom-3 left-3 rounded-full bg-white/60 px-2 py-1 text-[9px] text-plum/60 backdrop-blur">Photo placeholder{angle ? " · angle 2" : ""}</span>}
+      {tag && <span className="label-sm absolute bottom-3 left-3 rounded-full bg-white/60 px-2 py-1 text-[10px] text-plum/60 backdrop-blur">Photo placeholder{angle ? " · angle 2" : ""}</span>}
     </div>
   );
 }

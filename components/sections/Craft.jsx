@@ -52,7 +52,7 @@ export default function Craft() {
         <path d="M20 60 C120 0 180 140 260 80 S380 40 390 120 C360 220 260 180 200 260 S60 380 10 330 C40 240 0 160 20 60Z" fill="url(#silk)" />
       </svg>
       {/* foreground: model */}
-      <svg className="cr-fg absolute bottom-[-18%] left-[52%] h-[95%] -translate-x-1/2 md:left-[30%]" viewBox="0 0 300 400" aria-hidden>
+      <svg className="cr-fg absolute bottom-[-18%] left-[28%] h-[80%] -translate-x-1/2 opacity-40 sm:h-[95%] md:left-[30%] md:opacity-100" viewBox="0 0 300 400" aria-hidden>
         <path d={SHAPES.gown} fill={gown.colour} opacity=".9" />
         <ellipse cx="150" cy="30" rx="20" ry="25" fill="#C99A7A" opacity=".9" />
       </svg>
@@ -62,11 +62,11 @@ export default function Craft() {
         <div className="ml-auto w-full max-w-xl">
           <p className="label text-lavender">The Atelier</p>
           <h2 id="cr-h" className="sr-only">Craftsmanship</h2>
-          <div className="relative mt-8 h-[46vh] motion-reduce:h-auto">
+          <div className="relative mt-6 h-[56svh] motion-reduce:h-auto sm:mt-8 sm:h-[46vh]">
             {FRAMES.map((f, i) => (
               <div key={f.k} className={`cr-frame absolute inset-0 motion-reduce:relative motion-reduce:mb-12 ${i ? "opacity-0 motion-reduce:opacity-100" : ""}`}>
-                <span className="display-i text-[18vw] leading-none text-lavender/30 md:text-[10vw]">{f.k}</span>
-                <h3 className="display -mt-[0.4em] text-[14vw] md:text-[6vw]">{f.title}</h3>
+                <span className="display-i text-[22vw] leading-none text-lavender/30 sm:text-[14vw] lg:text-[10vw]">{f.k}</span>
+                <h3 className="display -mt-[0.4em] text-[15vw] sm:text-[10vw] lg:text-[6vw]">{f.title}</h3>
                 <p className="mt-6 max-w-sm text-[16px] leading-relaxed text-mist/80">{f.text}</p>
               </div>
             ))}

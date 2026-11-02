@@ -71,7 +71,7 @@ function AvatarBuilder() {
     <div>
       <div className="grid grid-cols-3 gap-1 rounded-full bg-mist/70 p-1" role="tablist" aria-label="Create avatar from">
         {[["photo", "Photo"], ["scan", "Body scan"], ["measure", "Measures"]].map(([k, t]) => (
-          <button key={k} role="tab" aria-selected={mode === k} onClick={() => setMode(k)} className={`label-sm rounded-full py-2.5 text-[9px] ${mode === k ? "bg-white shadow" : ""}`}>{t}</button>
+          <button key={k} role="tab" aria-selected={mode === k} onClick={() => setMode(k)} className={`label-sm min-h-10 rounded-full py-2.5 text-[10px] ${mode === k ? "bg-white shadow" : ""}`}>{t}</button>
         ))}
       </div>
 
@@ -89,7 +89,7 @@ function AvatarBuilder() {
         )}
         {mode === "scan" && (
           <div>
-            <div className="relative aspect-[3/4] overflow-hidden rounded-2xl bg-plum">
+            <div className="relative mx-auto aspect-[3/4] max-h-[60svh] overflow-hidden rounded-2xl bg-plum">
               <video ref={cam} autoPlay playsInline muted className={`h-full w-full object-cover ${scan === "live" || scan === "counting" ? "" : "hidden"}`} />
               <svg viewBox="0 0 300 400" className="pointer-events-none absolute inset-0 h-full w-full" aria-hidden>
                 <path d="M150 40a22 26 0 1 1 0 52a22 26 0 1 1 0-52M110 100h80l20 120-15 5-10-70v240h-30l-5-150-5 150h-30V155l-10 70-15-5Z" fill="none" stroke="#C9B6E4" strokeDasharray="6 6" strokeWidth="2" />
@@ -117,9 +117,9 @@ function AvatarBuilder() {
         {field("hip", "Hip", 80, 130)}
         <div>
           <span className="text-[12px]">Skin tone</span>
-          <div className="mt-2 flex gap-2" role="radiogroup" aria-label="Skin tone">
+          <div className="mt-2 flex flex-wrap gap-3" role="radiogroup" aria-label="Skin tone">
             {SKIN.map((c) => (
-              <button key={c} role="radio" aria-checked={body.skin === c} aria-label={`Skin tone ${c}`} onClick={() => setBody({ ...body, skin: c })} className={`h-7 w-7 rounded-full ring-offset-2 ${body.skin === c ? "ring-2 ring-amethyst" : ""}`} style={{ background: c }} />
+              <button key={c} role="radio" aria-checked={body.skin === c} aria-label={`Skin tone ${c}`} onClick={() => setBody({ ...body, skin: c })} className={`h-11 w-11 rounded-full ring-offset-2 sm:h-9 sm:w-9 ${body.skin === c ? "ring-2 ring-amethyst" : ""}`} style={{ background: c }} />
             ))}
           </div>
         </div>
@@ -145,7 +145,7 @@ function SizeRow({ id, size, setSize }) {
       </div>
       <div className="mt-3 flex gap-1" role="radiogroup" aria-label={`Size for ${p.name}`}>
         {SIZES.map((s) => (
-          <button key={s} role="radio" aria-checked={size === s} onClick={() => setSize(id, s)} className={`relative flex-1 rounded-full py-2 text-[12px] transition ${size === s ? "bg-plum text-pearl" : "bg-mist/60 hover:bg-mist"}`}>
+          <button key={s} role="radio" aria-checked={size === s} onClick={() => setSize(id, s)} className={`relative min-h-10 flex-1 rounded-full py-2 text-[13px] transition ${size === s ? "bg-plum text-pearl" : "bg-mist/60 hover:bg-mist"}`}>
             {s}
             {rec.size === s && <Spark className="absolute -right-1 -top-1.5 h-3.5 w-3.5" />}
           </button>
@@ -178,7 +178,6 @@ export default function DressingRoom() {
   const [spin, setSpin] = useState(false);
   const [mirror, setMirror] = useState(false);
   const [tab, setTab] = useState("dress");
-  const [left, setLeft] = useState("avatar"); // mobile: which panel is open
   const [toast, setToast] = useState(null);
   const campaign = params.get("campaign") === "1";
 
@@ -214,21 +213,19 @@ export default function DressingRoom() {
     } catch {}
   };
 
-  const panelBtn = (k, t) => (
-    <button onClick={() => setLeft(left === k ? null : k)} aria-expanded={left === k} className={`label-sm rounded-full px-4 py-2.5 ${left === k ? "bg-plum text-pearl" : "bg-white/80"}`}>{t}</button>
-  );
 
   return (
     <div className={`min-h-[100svh] pt-20 ${campaign ? "bg-plum text-pearl" : "bg-pearl"}`}>
-      <div className="mx-auto grid max-w-[1700px] gap-4 px-3 pb-6 sm:px-5 lg:h-[calc(100svh-5.5rem)] lg:grid-cols-[320px_1fr_360px]">
+      {/* Phone: stage → wardrobe → avatar. Tablet: sticky stage beside the panels. xl: three columns. */}
+      <div className="mx-auto grid max-w-[1700px] grid-cols-1 gap-3 px-3 pb-24 sm:gap-4 sm:px-5 md:grid-cols-[minmax(0,1fr)_340px] md:pb-6 xl:h-[calc(100svh-5.5rem)] xl:grid-cols-[320px_minmax(0,1fr)_360px]">
         {/* Avatar */}
-        <aside className={`no-scrollbar order-2 overflow-y-auto rounded-[24px] bg-white/80 p-5 text-plum lg:order-1 lg:block ${left === "avatar" ? "block" : "hidden"}`} data-lenis-prevent aria-label="Your avatar">
+        <aside id="avatar-panel" className="no-scrollbar order-3 scroll-mt-24 rounded-[24px] bg-white/80 p-5 text-plum md:col-start-2 md:row-start-2 xl:order-none xl:col-start-1 xl:row-start-1 xl:overflow-y-auto" data-lenis-prevent aria-label="Your avatar">
           <h2 className="display text-[30px]">Your avatar</h2>
           <p className="mb-5 mt-1 text-[12px] text-ink-soft">Create it once. Every size recommendation uses it.</p>
           <AvatarBuilder />
           <label className="mt-5 block text-[12px]">
             Return history (improves sizing)
-            <select value={returnHistory} onChange={(e) => setReturnHistory(e.target.value)} className="mt-1.5 w-full rounded-full border border-plum/15 bg-white px-3 py-2">
+            <select value={returnHistory} onChange={(e) => setReturnHistory(e.target.value)} className="mt-1.5 min-h-11 w-full rounded-full border border-plum/15 bg-white px-4 py-2.5">
               <option value="none">No returns yet</option>
               <option value="tight">I usually return things for being too tight</option>
               <option value="loose">I usually return things for being too loose</option>
@@ -237,45 +234,45 @@ export default function DressingRoom() {
         </aside>
 
         {/* Stage */}
-        <section className={`grain vignette relative order-1 h-[68svh] overflow-hidden rounded-[24px] lg:order-2 lg:h-auto ${campaign ? "bg-gradient-to-b from-plum-2 to-plum" : "bg-gradient-to-b from-white to-mist"}`} aria-label="3D try-on stage">
+        <section className={`grain vignette relative order-1 h-[62svh] min-h-[440px] overflow-hidden rounded-[24px] md:sticky md:top-20 md:col-start-1 md:row-span-2 md:row-start-1 md:h-[calc(100svh-6rem)] md:self-start xl:relative xl:top-auto xl:order-none xl:col-start-2 xl:row-span-1 xl:h-auto xl:self-stretch ${campaign ? "bg-gradient-to-b from-plum-2 to-plum" : "bg-gradient-to-b from-white to-mist"}`} aria-label="3D try-on stage">
           <AvatarScene className="absolute inset-0" body={body} outfit={outfit} sizes={effectiveSizes} heatmap={heat} pose={pose} autoRotate={spin} dark={campaign} />
           {campaign && (
-            <div className="pointer-events-none absolute left-6 top-6 z-[5] text-pearl">
+            <div className="pointer-events-none absolute left-4 top-4 z-[5] max-w-[70%] text-pearl sm:left-6 sm:top-6">
               <p className="label text-lavender">Campaign mode</p>
-              <p className="display-i mt-2 text-[40px] leading-none">On your body, in your tone.</p>
+              <p className="display-i mt-2 text-[28px] leading-none sm:text-[40px]">On your body, in your tone.</p>
             </div>
           )}
           <div className="absolute inset-x-3 bottom-3 z-[5] flex flex-wrap items-center justify-center gap-2">
             <div className="flex gap-1 rounded-full bg-white/80 p-1 text-plum backdrop-blur" role="radiogroup" aria-label="Pose">
               {[["stand", "Stand"], ["hip", "Pose"], ["walk", "Walk"]].map(([k, t]) => (
-                <button key={k} role="radio" aria-checked={pose === k} onClick={() => setPose(k)} className={`label-sm rounded-full px-3.5 py-2 ${pose === k ? "bg-plum text-pearl" : ""}`}>{t}</button>
+                <button key={k} role="radio" aria-checked={pose === k} onClick={() => setPose(k)} className={`label-sm min-h-10 rounded-full px-3.5 py-2.5 ${pose === k ? "bg-plum text-pearl" : ""}`}>{t}</button>
               ))}
             </div>
             <button onClick={() => setSpin(!spin)} aria-pressed={spin} className={`label-sm rounded-full px-4 py-3 backdrop-blur ${spin ? "bg-plum text-pearl" : "bg-white/80 text-plum"}`}>360°</button>
             <button onClick={() => setHeat(!heat)} aria-pressed={heat} className={`ai-glow label-sm flex items-center gap-1.5 rounded-full px-4 py-3 backdrop-blur ${heat ? "bg-plum text-pearl" : "bg-white/80 text-plum"}`}><Spark className="h-3 w-3" />Heatmap</button>
             <button onClick={() => setMirror(true)} className="label-sm rounded-full bg-white/80 px-4 py-3 text-plum backdrop-blur" data-cursor="Mirror">Live Mirror</button>
           </div>
-          {heat && <div className="absolute left-1/2 top-4 z-[5] -translate-x-1/2"><HeatLegend /></div>}
-          <div className="absolute right-3 top-3 z-[5] flex gap-2 lg:hidden">
-            {panelBtn("avatar", "Avatar")}
-          </div>
+          {heat && <div className="absolute left-3 top-3 z-[5] md:left-1/2 md:top-4 md:-translate-x-1/2"><HeatLegend /></div>}
+          <button onClick={() => document.getElementById("avatar-panel")?.scrollIntoView({ behavior: "smooth" })} className="label-sm absolute right-3 top-3 z-[5] min-h-11 rounded-full bg-white/80 px-4 text-plum backdrop-blur md:hidden">
+            Your avatar ↓
+          </button>
           {toast && <p className="absolute left-1/2 top-16 z-[6] -translate-x-1/2 rounded-full bg-plum px-4 py-2 text-[12px] text-pearl" role="status">{toast}</p>}
         </section>
 
         {/* Wardrobe */}
-        <aside className="no-scrollbar order-3 flex flex-col overflow-y-auto rounded-[24px] bg-white/80 p-5 text-plum" data-lenis-prevent aria-label="Wardrobe and fit">
+        <aside className="no-scrollbar order-2 flex flex-col rounded-[24px] bg-white/80 p-4 text-plum sm:p-5 md:col-start-2 md:row-start-1 xl:order-none xl:col-start-3 xl:overflow-y-auto" data-lenis-prevent aria-label="Wardrobe and fit">
           <div className="no-scrollbar -mx-1 flex gap-1 overflow-x-auto px-1" role="tablist" aria-label="Categories">
             {SLOTS.map(([k, t]) => (
-              <button key={k} role="tab" aria-selected={tab === k} onClick={() => setTab(k)} className={`label-sm shrink-0 rounded-full px-3 py-2 ${tab === k ? "bg-plum text-pearl" : "bg-mist/60"}`}>{t}</button>
+              <button key={k} role="tab" aria-selected={tab === k} onClick={() => setTab(k)} className={`label-sm min-h-10 shrink-0 rounded-full px-3.5 py-2.5 ${tab === k ? "bg-plum text-pearl" : "bg-mist/60"}`}>{t}</button>
             ))}
           </div>
-          <div className="mt-4 grid grid-cols-3 gap-2">
+          <div className="mt-4 grid grid-cols-3 gap-2 sm:grid-cols-4 md:grid-cols-3">
             {PRODUCTS.filter((p) => p.slot === tab).map((p) => {
               const on = outfit.includes(p.id);
               return (
                 <button key={p.id} onClick={() => setOutfit((o) => wear(o, p.id))} aria-pressed={on} className={`rounded-xl p-1 text-left transition ${on ? "bg-mist ring-2 ring-amethyst" : "hover:bg-mist/50"}`} data-cursor={on ? "Remove" : "Try on"}>
                   <GarmentArt product={p} className="aspect-[3/4] rounded-lg" tag={false} />
-                  <span className="mt-1 block truncate px-0.5 text-[10px]">{p.name}</span>
+                  <span className="mt-1 block truncate px-0.5 text-[11px]">{p.name}</span>
                 </button>
               );
             })}
@@ -294,17 +291,17 @@ export default function DressingRoom() {
 
           <h3 className="label mt-7 text-amethyst">Lookbook</h3>
           {lookbook.length === 0 && <p className="mt-2 text-[12px] text-ink-soft">Saved looks appear here.</p>}
-          <div className="mt-3 grid grid-cols-2 gap-2">
+          <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-2">
             {lookbook.map((l) => (
               <div key={l.at} className="rounded-xl bg-mist/50 p-2">
                 <button className="flex w-full -space-x-6" onClick={() => { setOutfit(l.items); setSizes(l.sizes ?? {}); setPose(l.pose ?? "stand"); }} aria-label="Wear this saved look">
                   {l.items.slice(0, 3).map((id) => <GarmentArt key={id} product={byId(id)} className="aspect-[3/4] w-1/2 rounded-md ring-2 ring-white" tag={false} />)}
                 </button>
-                <button onClick={() => removeLook(l.at)} className="label-sm mt-1.5 text-[9px] text-plum/50">Remove</button>
+                <button onClick={() => removeLook(l.at)} className="label-sm mt-1 py-2 text-[10px] text-plum/50">Remove</button>
               </div>
             ))}
           </div>
-          <Link href="/" className="label-sm mt-8 text-plum/50">← Back to the film</Link>
+          <Link href="/" className="label-sm mt-6 py-3 text-plum/50">← Back to the film</Link>
         </aside>
       </div>
       {mirror && <LiveMirror outfit={outfit} onClose={closeMirror} />}

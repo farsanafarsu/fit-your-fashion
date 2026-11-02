@@ -36,7 +36,7 @@ export default function LiveMirror({ outfit, onClose }) {
       <video ref={video} autoPlay playsInline muted className="absolute inset-0 h-full w-full -scale-x-100 object-cover" />
       {err && <p className="absolute inset-x-6 top-1/2 mx-auto max-w-md -translate-y-1/2 text-center text-[15px]">{err}</p>}
       <div className="pointer-events-none absolute inset-0 grid place-items-center">
-        <div className="relative h-[70vh] w-[52.5vh]" style={{ transform: `translateY(${y}vh) scale(${scale})` }}>
+        <div className="relative h-[min(70svh,125vw)] w-[min(52.5svh,94vw)]" style={{ transform: `translateY(${y}vh) scale(${scale})` }}>
           {layers.map((p) => (
             <svg key={p.id} viewBox="0 0 300 400" className="absolute inset-0 h-full w-full drop-shadow-[0_10px_30px_rgba(30,21,48,.4)]" aria-hidden>
               <path d={SHAPES[p.type]} fill={p.type === "necklace" ? "none" : p.colour} stroke={p.type === "necklace" ? p.colour : "none"} strokeWidth="10" opacity={p.type === "cape" ? 0.55 : 0.92} />
@@ -44,14 +44,14 @@ export default function LiveMirror({ outfit, onClose }) {
           ))}
         </div>
       </div>
-      <div className="absolute inset-x-0 top-0 flex items-center justify-between p-5">
+      <div className="absolute inset-x-0 top-0 flex items-center justify-between gap-3 p-3 pt-[max(0.75rem,env(safe-area-inset-top))] sm:p-5">
         <span className="label-sm rounded-full bg-white/15 px-4 py-2 backdrop-blur">Live Mirror · prototype</span>
         <button onClick={onClose} className="label-sm rounded-full bg-pearl px-5 py-3 text-plum" autoFocus>Close mirror</button>
       </div>
-      <div className="absolute inset-x-0 bottom-0 flex flex-wrap items-center justify-center gap-6 bg-gradient-to-t from-plum/80 p-6 text-[12px]">
+      <div className="absolute inset-x-0 bottom-0 flex flex-wrap items-center justify-center gap-x-6 gap-y-3 bg-gradient-to-t from-plum/80 p-4 pb-[max(1rem,env(safe-area-inset-bottom))] text-[12px] sm:p-6">
         <label className="flex items-center gap-3">Size in frame <input type="range" min="0.6" max="1.4" step="0.01" value={scale} onChange={(e) => setScale(+e.target.value)} /></label>
         <label className="flex items-center gap-3">Height <input type="range" min="-20" max="20" step="0.5" value={y} onChange={(e) => setY(+e.target.value)} /></label>
-        <span className="opacity-70">Stand back so your shoulders meet the neckline. The stream never leaves your device.</span>
+        <span className="w-full text-center opacity-70 md:w-auto">Stand back so your shoulders meet the neckline. The stream never leaves your device.</span>
       </div>
     </div>
   );

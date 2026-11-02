@@ -15,7 +15,7 @@ export const metadata = {
   description: "Luxury-meets-future fashion with an AI dressing room and personal stylist.",
 };
 
-export const viewport = { themeColor: "#1E1530", width: "device-width", initialScale: 1 };
+export const viewport = { themeColor: "#1E1530", width: "device-width", initialScale: 1, viewportFit: "cover" };
 
 export default function RootLayout({ children }) {
   return (

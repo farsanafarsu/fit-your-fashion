@@ -101,7 +101,7 @@ export function Button({ children, variant = "solid", className = "", as: Tag = 
 
 export function PlaceholderTag({ children = "Placeholder", className = "" }) {
   return (
-    <span className={`label-sm pointer-events-none absolute z-10 rounded-full border border-current/30 bg-white/50 px-2.5 py-1 text-[9px] text-plum/70 backdrop-blur ${className}`}>
+    <span className={`label-sm pointer-events-none absolute z-10 rounded-full border border-current/30 bg-white/50 px-2.5 py-1 text-[10px] text-plum/70 backdrop-blur ${className}`}>
       {children}
     </span>
   );
@@ -109,10 +109,10 @@ export function PlaceholderTag({ children = "Placeholder", className = "" }) {
 
 export function ChapterLabel({ n, title, dark = false }) {
   return (
-    <div className={`flex items-center gap-4 ${dark ? "text-lavender" : "text-amethyst"}`}>
-      <span className="label">Chapter {n}</span>
-      <span className="h-px w-12 bg-current opacity-50" />
-      <span className="label">{title}</span>
+    <div className={`flex flex-wrap items-center gap-x-4 gap-y-2 ${dark ? "text-lavender" : "text-amethyst"}`}>
+      <span className="label whitespace-nowrap">Chapter {n}</span>
+      <span className="h-px w-8 bg-current opacity-50 sm:w-12" />
+      <span className="label whitespace-nowrap">{title}</span>
     </div>
   );
 }

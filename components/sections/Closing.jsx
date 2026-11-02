@@ -12,15 +12,15 @@ export function UGCWall() {
     <section className="overflow-hidden bg-pearl py-24 md:py-32" aria-labelledby="ugc-h">
       <div className="mx-auto max-w-[1500px] px-[var(--gutter)] text-center">
         <p className="label text-amethyst">Worn by you</p>
-        <h2 id="ugc-h" className="display mx-auto mt-6 max-w-4xl text-[12vw] md:text-[5.5vw]">The Inner Circle, <span className="display-i">in the mirror.</span></h2>
+        <h2 id="ugc-h" className="display mx-auto mt-6 max-w-4xl text-[12vw] sm:text-[8vw] lg:text-[5.5vw]">The Inner Circle, <span className="display-i">in the mirror.</span></h2>
         <p className="mx-auto mt-6 max-w-md text-[14px] text-ink-soft">Real try-on looks shared by customers with #FitYourFashion appear here once they opt in.</p>
       </div>
       <div className="relative mt-14" data-reveal="curtain">
         <div className="flex w-max gap-4" style={{ animation: "pan 60s linear infinite" }}>
           {[...tiles, ...tiles].map((p, i) => (
-            <div key={i} className="relative w-[44vw] shrink-0 sm:w-[22vw] lg:w-[15vw]" aria-hidden={i >= tiles.length}>
+            <div key={i} className="relative w-[46vw] shrink-0 sm:w-[28vw] md:w-[22vw] lg:w-[15vw]" aria-hidden={i >= tiles.length}>
               <GarmentArt product={p} angle={i % 2} className={`rounded-[4px] ${i % 3 ? "aspect-[3/4]" : "aspect-[4/5] mt-10"}`} tag={false} />
-              <span className="label-sm absolute left-2 top-2 rounded-full bg-white/70 px-2 py-1 text-[8px] text-plum/60">Customer look placeholder</span>
+              <span className="label-sm absolute left-2 top-2 rounded-full bg-white/70 px-2 py-1 text-[10px] text-plum/60">Customer look placeholder</span>
             </div>
           ))}
         </div>
@@ -40,7 +40,7 @@ export function Newsletter() {
       <div className="pointer-events-none absolute left-1/2 top-1/2 h-[50vmax] w-[50vmax] -translate-x-1/2 -translate-y-1/2 rounded-full bg-amethyst/40 blur-[160px]" aria-hidden />
       <div className="relative mx-auto max-w-3xl px-[var(--gutter)] text-center">
         <p className="label text-lavender">Early access</p>
-        <h2 id="nl-h" className="display mt-6 text-[14vw] md:text-[7vw]">Join the <span className="display-i iris-text">Inner Circle</span></h2>
+        <h2 id="nl-h" className="display mt-6 text-[14vw] sm:text-[10vw] lg:text-[7vw]">Join the <span className="display-i iris-text">Inner Circle</span></h2>
         <p className="mx-auto mt-6 max-w-md text-[15px] text-mist/75">First look at every drop, private fittings in the AI Dressing Room, and invitations to the film premieres.</p>
         {done ? (
           <p className="display-i mt-12 text-[28px] text-lavender" role="status">You’re on the list. Watch your inbox.</p>
@@ -54,7 +54,7 @@ export function Newsletter() {
             }}
           >
             <label htmlFor="nl-email" className="sr-only">Email address</label>
-            <input id="nl-email" type="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Your email" className="flex-1 rounded-full border border-white/25 bg-white/5 px-6 py-4 text-[15px] outline-none placeholder:text-mist/50 focus:border-lavender" />
+            <input id="nl-email" type="email" inputMode="email" autoComplete="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Your email" className="min-w-0 flex-1 rounded-full border border-white/25 bg-white/5 px-6 py-4 text-[15px] outline-none placeholder:text-mist/50 focus:border-lavender" />
             <Button variant="light" type="submit">Request access</Button>
           </form>
         )}
@@ -72,14 +72,14 @@ export function Footer() {
   };
   return (
     <footer className="on-dark overflow-hidden bg-plum pb-6 pt-24 text-pearl">
-      <div className="mx-auto grid max-w-[1500px] gap-12 px-[var(--gutter)] md:grid-cols-[1.4fr_repeat(3,1fr)]">
-        <p className="display-i max-w-xs text-[28px] leading-tight text-mist">A fashion film where an intelligent stylist dresses you.</p>
+      <div className="mx-auto grid max-w-[1500px] grid-cols-2 gap-x-6 gap-y-10 px-[var(--gutter)] sm:grid-cols-3 lg:grid-cols-[1.4fr_repeat(3,1fr)] lg:gap-12">
+        <p className="display-i col-span-2 max-w-xs text-[26px] leading-tight text-mist sm:col-span-3 sm:text-[28px] lg:col-span-1">A fashion film where an intelligent stylist dresses you.</p>
         {Object.entries(cols).map(([h, links]) => (
           <nav key={h} aria-label={h}>
             <p className="label-sm text-lavender">{h}</p>
-            <ul className="mt-5 space-y-3 text-[14px] text-mist/80">
+            <ul className="mt-3 text-[14px] text-mist/80 sm:mt-5">
               {links.map(([t, href]) => (
-                <li key={t}><Link href={href} className="hover:text-pearl"><Scramble text={t} /></Link></li>
+                <li key={t}><Link href={href} className="block py-2 hover:text-pearl"><Scramble text={t} /></Link></li>
               ))}
             </ul>
           </nav>

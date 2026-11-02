@@ -19,13 +19,13 @@ export default function PickedForYou() {
       <div className="mx-auto flex max-w-[1500px] flex-col justify-between gap-4 px-[var(--gutter)] md:flex-row md:items-end">
         <div>
           <p className="label flex items-center gap-2 text-amethyst"><Spark className="h-3.5 w-3.5" /> AI-curated</p>
-          <h2 id="pk-h" className="display mt-5 text-[13vw] md:text-[5.5vw]">Picked <span className="display-i">for you</span></h2>
+          <h2 id="pk-h" className="display mt-5 text-[13vw] sm:text-[9vw] lg:text-[5.5vw]">Picked <span className="display-i">for you</span></h2>
         </div>
         <p className="text-[14px] text-ink-soft" aria-live="polite">{why}</p>
       </div>
-      <div className="no-scrollbar mt-12 flex snap-x gap-5 overflow-x-auto px-[var(--gutter)] pb-4">
+      <div className="no-scrollbar mt-10 flex snap-x snap-mandatory scroll-px-[var(--gutter)] gap-4 overflow-x-auto overscroll-x-contain px-[var(--gutter)] pb-4 sm:gap-5 md:mt-12">
         {ranked.map((p) => (
-          <ProductCard key={p.id} product={p} className="w-[62vw] shrink-0 snap-start sm:w-[34vw] lg:w-[21vw]" />
+          <ProductCard key={p.id} product={p} className="w-[64vw] shrink-0 snap-start sm:w-[40vw] md:w-[30vw] lg:w-[21vw]" />
         ))}
       </div>
     </section>

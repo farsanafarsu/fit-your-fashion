@@ -35,16 +35,16 @@ export default function DressingChapter() {
   return (
     <section ref={ref} id="dressing-room" className="on-dark relative overflow-hidden bg-plum py-28 text-pearl md:py-40" aria-labelledby="dr-h">
       <div className="pointer-events-none absolute left-1/2 top-1/3 h-[60vmax] w-[60vmax] -translate-x-1/2 rounded-full bg-amethyst/30 blur-[140px]" aria-hidden />
-      <div className="relative mx-auto grid max-w-[1500px] items-center gap-14 px-[var(--gutter)] lg:grid-cols-[1fr_1.1fr]">
+      <div className="relative mx-auto grid max-w-[1500px] grid-cols-1 items-center gap-12 px-[var(--gutter)] *:min-w-0 md:gap-14 lg:grid-cols-[1fr_1.1fr]">
         <div>
           <ChapterLabel n="02" title="The AI Dressing Room" dark />
-          <h2 id="dr-h" className="display mt-8 text-[15vw] md:text-[7.4vw]">
+          <h2 id="dr-h" className="display mt-8 text-[15vw] sm:text-[11vw] lg:text-[7.4vw]">
             Try the <span className="display-i iris-text">future</span> on.
           </h2>
           <p className="mt-8 max-w-md text-[16px] leading-relaxed text-mist/80">
             Build an avatar from a photo, a quick phone scan or your measurements. Layer pieces, swap sizes and watch the fit change — then step into Live Mirror.
           </p>
-          <ul className="mt-10 grid max-w-md grid-cols-2 gap-x-6 gap-y-4 text-[13px] text-mist/80">
+          <ul className="mt-10 grid max-w-md grid-cols-1 gap-x-6 gap-y-3 text-[14px] text-mist/80 min-[400px]:grid-cols-2 sm:text-[13px]">
             {["360° rotate · pose · walk", "Layer top, bottom, accessories", "Fit heatmap per size", "Live Mirror AR (webcam)", "AI Size Predictor", "Save & share your Lookbook"].map((t) => (
               <li key={t} className="flex items-center gap-2">
                 <Spark className="h-3 w-3 shrink-0" animate={false} /> {t}
@@ -59,17 +59,17 @@ export default function DressingChapter() {
         </div>
 
         <div className="relative">
-          <div className="relative aspect-[4/5] overflow-hidden rounded-[28px] bg-gradient-to-b from-plum-2 to-plum ring-1 ring-white/10">
+          <div className="relative mx-auto aspect-[3/4] max-h-[85svh] overflow-hidden rounded-[24px] sm:aspect-[4/5] sm:rounded-[28px] bg-gradient-to-b from-plum-2 to-plum ring-1 ring-white/10">
             {inView && <AvatarScene className="absolute inset-0" body={body} outfit={items} sizes={sizes} heatmap={heat} pose="walk" autoRotate dark />}
             <div className="absolute inset-x-4 top-4 flex flex-wrap items-center justify-between gap-2">
               <div className="flex gap-1.5 rounded-full bg-white/10 p-1 backdrop-blur-md" role="tablist" aria-label="Preview looks">
                 {LOOKS.map((l, i) => (
-                  <button key={l.name} role="tab" aria-selected={look === i} onClick={() => setLook(i)} className={`label-sm rounded-full px-3.5 py-2 ${look === i ? "bg-pearl text-plum" : "text-pearl"}`}>
+                  <button key={l.name} role="tab" aria-selected={look === i} onClick={() => setLook(i)} className={`label-sm rounded-full px-3 py-2.5 sm:px-3.5 ${look === i ? "bg-pearl text-plum" : "text-pearl"}`}>
                     {l.name}
                   </button>
                 ))}
               </div>
-              <button onClick={() => setHeat(!heat)} aria-pressed={heat} className={`ai-glow label-sm flex items-center gap-2 rounded-full px-4 py-2.5 backdrop-blur-md ${heat ? "bg-pearl text-plum" : "bg-white/10"}`}>
+              <button onClick={() => setHeat(!heat)} aria-pressed={heat} className={`ai-glow label-sm flex items-center gap-2 rounded-full px-4 py-3 backdrop-blur-md ${heat ? "bg-pearl text-plum" : "bg-white/10"}`}>
                 <Spark className="h-3 w-3" /> Fit heatmap
               </button>
             </div>

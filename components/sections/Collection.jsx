@@ -32,10 +32,10 @@ export default function Collection() {
 
   return (
     <section id="collection" ref={root} className="relative overflow-hidden bg-pearl py-24 md:flex md:h-screen md:items-center md:py-0" aria-labelledby="col-h">
-      <div ref={track} className="no-scrollbar flex snap-x snap-mandatory items-center gap-6 overflow-x-auto px-[var(--gutter)] md:snap-none md:gap-[6vw] md:overflow-visible">
-        <div className="w-[80vw] shrink-0 snap-start md:w-[34vw]">
+      <div ref={track} className="no-scrollbar flex snap-x snap-mandatory scroll-px-[var(--gutter)] items-center gap-5 overflow-x-auto overscroll-x-contain px-[var(--gutter)] sm:gap-6 md:snap-none md:gap-[5vw] md:overflow-visible">
+        <div className="w-[84vw] shrink-0 snap-start sm:w-[60vw] md:w-[44vw] lg:w-[34vw]">
           <ChapterLabel n="01" title="The Collection" />
-          <h2 id="col-h" className="display mt-8 text-[18vw] md:text-[9vw]">
+          <h2 id="col-h" className="display mt-8 text-[17vw] sm:text-[12vw] md:text-[10vw] lg:text-[9vw]">
             The <span className="display-i text-amethyst">Lavender</span> Hour
           </h2>
           <p className="mt-6 max-w-sm text-[15px] leading-relaxed text-ink-soft">
@@ -49,7 +49,8 @@ export default function Collection() {
             key={p.id}
             product={p}
             index={i}
-            className={`c-card w-[72vw] shrink-0 snap-center sm:w-[46vw] md:w-[24vw] ${i % 3 === 1 ? "md:w-[30vw]" : ""}`}
+            /* width capped by viewport height so cards fit when pinned on landscape tablets/phones */
+            className={`c-card shrink-0 snap-center ${i % 3 === 1 ? "w-[78vw] sm:w-[50vw] md:w-[min(44vw,50svh)] lg:w-[min(30vw,54svh)]" : "w-[70vw] sm:w-[42vw] md:w-[min(38vw,46svh)] lg:w-[min(24vw,46svh)]"}`}
             aspect={i % 3 === 1 ? "aspect-[4/5]" : "aspect-[3/4]"}
           />
         ))}

@@ -24,10 +24,10 @@ function Outfit({ outfit, dark }) {
         ))}
       </div>
       <div className="mt-3 flex gap-2">
-        <Link href={href} className="label-sm flex-1 rounded-full bg-plum py-2.5 text-center text-pearl hover:bg-amethyst" data-cursor="Try on">
+        <Link href={href} className="label-sm flex-1 rounded-full bg-plum py-3 text-center text-pearl hover:bg-amethyst" data-cursor="Try on">
           Try it on
         </Link>
-        <button onClick={() => outfit.items.forEach((id) => addToBag(id))} className={`label-sm flex-1 rounded-full border py-2.5 ${dark ? "border-white/30" : "border-plum/30"}`}>
+        <button onClick={() => outfit.items.forEach((id) => addToBag(id))} className={`label-sm flex-1 rounded-full border py-3 ${dark ? "border-white/30" : "border-plum/30"}`}>
           Add look to bag
         </button>
       </div>
@@ -109,7 +109,7 @@ export default function StylistChat({ dark = false, preview = false, className =
           <div key={i} className={m.from === "me" ? "flex justify-end" : ""}>
             {m.from === "ai" && (
               <div className="mb-1.5 flex items-center gap-1.5 opacity-70">
-                <Spark className="h-3 w-3" /> <span className="label-sm text-[9px]">Stylist</span>
+                <Spark className="h-3 w-3" /> <span className="label-sm text-[10px]">Stylist</span>
               </div>
             )}
             <p className={`max-w-[85%] rounded-2xl px-4 py-3 text-[14px] leading-relaxed ${m.from === "me" ? "rounded-br-sm bg-amethyst text-white" : `rounded-tl-sm ${bubble}`}`}>{m.text}</p>
@@ -130,7 +130,7 @@ export default function StylistChat({ dark = false, preview = false, className =
       {msgs.length < 2 && !preview && (
         <div className="no-scrollbar mt-3 flex gap-2 overflow-x-auto pb-1">
           {SUGGESTIONS.map((s) => (
-            <button key={s} onClick={() => send(s)} className={`shrink-0 rounded-full border px-3 py-2 text-[12px] ${dark ? "border-white/20" : "border-plum/15 bg-white/60"}`}>
+            <button key={s} onClick={() => send(s)} className={`min-h-10 shrink-0 rounded-full border px-3.5 py-2 text-[13px] ${dark ? "border-white/20" : "border-plum/15 bg-white/60"}`}>
               {s}
             </button>
           ))}
@@ -152,11 +152,11 @@ export default function StylistChat({ dark = false, preview = false, className =
           className="min-w-0 flex-1 bg-transparent text-[14px] outline-none placeholder:opacity-50"
         />
         {SR && (
-          <button type="button" onClick={voice} aria-label="Speak to the stylist" aria-pressed={listening} className={`grid h-10 w-10 place-items-center rounded-full ${listening ? "bg-amethyst text-white" : ""}`}>
+          <button type="button" onClick={voice} aria-label="Speak to the stylist" aria-pressed={listening} className={`grid h-11 w-11 shrink-0 place-items-center rounded-full ${listening ? "bg-amethyst text-white" : ""}`}>
             <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden><rect x="9" y="3" width="6" height="11" rx="3" /><path d="M5 11a7 7 0 0 0 14 0M12 18v3" /></svg>
           </button>
         )}
-        <button type="submit" className="label-sm rounded-full bg-plum px-5 py-3 text-pearl">Ask</button>
+        <button type="submit" className="label-sm min-h-11 shrink-0 rounded-full bg-plum px-5 text-pearl">Ask</button>
       </form>
       <p className="mt-2 text-[10px] opacity-50">Prototype: styling runs on-device from the catalogue. Voice uses your browser’s speech recognition.</p>
     </div>

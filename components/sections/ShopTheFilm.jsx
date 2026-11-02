@@ -33,14 +33,14 @@ export default function ShopTheFilm() {
         <div className="flex flex-col justify-between gap-6 md:flex-row md:items-end">
           <div>
             <p className="label text-lavender">Shop the film</p>
-            <h2 id="sf-h" className="display mt-6 text-[13vw] md:text-[6vw]">Pause. <span className="display-i text-lavender">Everything is yours.</span></h2>
+            <h2 id="sf-h" className="display mt-6 text-[13vw] sm:text-[9vw] lg:text-[6vw]">Pause. <span className="display-i text-lavender">Everything is yours.</span></h2>
           </div>
           <p className="max-w-xs text-[14px] text-mist/70">Freeze the campaign and every look in frame becomes tappable.</p>
         </div>
 
-        <div className="grain vignette relative mt-12 aspect-[9/14] overflow-hidden rounded-[6px] sm:aspect-[16/9]">
+        <div className="grain vignette relative mt-10 aspect-[3/4] max-h-[85svh] w-full overflow-hidden rounded-[6px] sm:aspect-[4/3] md:mt-12 lg:aspect-[16/9]">
           {MEDIA.campaignFilm ? null : <SilkFilm dark={0.75} paused={paused} className="absolute inset-0" />}
-          <PlaceholderTag className="left-4 top-4 text-plum">Campaign film placeholder</PlaceholderTag>
+          <PlaceholderTag className="bottom-3 left-3 text-plum sm:bottom-auto sm:left-4 sm:top-4">Campaign film placeholder</PlaceholderTag>
           {CAST.map((c, i) => (
             <div
               key={i}
@@ -53,7 +53,7 @@ export default function ShopTheFilm() {
                   <button
                     key={id}
                     onClick={() => setOpen(open === id ? null : id)}
-                    className="absolute z-10 grid h-8 w-8 -translate-x-1/2 -translate-y-1/2 place-items-center"
+                    className="absolute z-10 grid h-11 w-11 -translate-x-1/2 -translate-y-1/2 place-items-center"
                     style={{ left: `${hx}%`, top: `${hy}%` }}
                     aria-label={`Shop ${byId(id).name}`}
                     aria-expanded={open === id}
@@ -66,20 +66,20 @@ export default function ShopTheFilm() {
             </div>
           ))}
           {open && (
-            <div className="absolute bottom-5 left-5 right-5 z-20 flex items-center gap-4 rounded-2xl bg-pearl p-4 text-plum sm:left-auto sm:w-[360px]" role="dialog" aria-label={byId(open).name}>
+            <div className="absolute bottom-3 left-3 right-3 z-20 flex items-center gap-3 rounded-2xl bg-pearl p-3 text-plum sm:bottom-5 sm:left-auto sm:right-5 sm:w-[360px] sm:gap-4 sm:p-4" role="dialog" aria-label={byId(open).name}>
               <div className="flex-1">
                 <p className="display text-[22px] leading-tight">{byId(open).name}</p>
                 <p className="text-[12px] text-ink-soft">{byId(open).fabric} · {formatPrice()}</p>
               </div>
               <div className="flex flex-col gap-1.5">
-                <Link href={`/dressing-room?look=${open}`} className="label-sm rounded-full bg-plum px-4 py-2 text-center text-pearl">Try on</Link>
-                <button onClick={() => addToBag(open)} className="label-sm rounded-full border border-plum/30 px-4 py-2">Add</button>
+                <Link href={`/dressing-room?look=${open}`} className="label-sm rounded-full bg-plum px-4 py-3 text-center text-pearl">Try on</Link>
+                <button onClick={() => addToBag(open)} className="label-sm rounded-full border border-plum/30 px-4 py-3">Add</button>
               </div>
             </div>
           )}
           <button
             onClick={() => { setPaused(!paused); setOpen(null); }}
-            className="absolute right-5 top-5 z-20 flex items-center gap-2 rounded-full bg-white/15 px-5 py-3 backdrop-blur-md"
+            className="absolute right-3 top-3 z-20 flex min-h-11 items-center gap-2 rounded-full bg-white/15 px-4 py-3 backdrop-blur-md sm:right-5 sm:top-5 sm:px-5"
             aria-pressed={paused}
             data-cursor={paused ? "Play" : "Pause"}
           >
