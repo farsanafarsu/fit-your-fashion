@@ -1,5 +1,6 @@
 "use client";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { useApp } from "@/lib/store";
 import { Spark, Scramble } from "./ui/primitives";
@@ -20,6 +21,9 @@ export default function Header() {
   const { setPanel, bag, wishlist, sound, setSound } = useApp();
   const [hidden, setHidden] = useState(false);
   const [solid, setSolid] = useState(false);
+  const [pastHero, setPastHero] = useState(false);
+  const onHome = usePathname() === "/";
+  const fab = !onHome || pastHero; // on the homepage the mobile stylist button waits until the hero scrolls away
   const last = useRef(0);
 
   useEffect(() => {
@@ -27,6 +31,7 @@ export default function Header() {
       const y = window.scrollY;
       setHidden(y > 120 && y > last.current);
       setSolid(y > 40);
+      setPastHero(y > window.innerHeight * 0.7);
       last.current = y;
     };
     window.addEventListener("scroll", onScroll, { passive: true });
@@ -80,7 +85,7 @@ export default function Header() {
     {/* Mobile: stylist is a floating button that opens a bottom sheet (outside the header's transform) */}
       <button
         onClick={() => setPanel("stylist")}
-        className="ai-glow label-sm fixed bottom-[max(1.25rem,env(safe-area-inset-bottom))] right-4 z-[90] inline-flex items-center gap-2 rounded-full bg-pearl/90 px-5 py-3.5 text-plum shadow-xl backdrop-blur md:hidden"
+        className={`ai-glow label-sm fixed bottom-[max(1.25rem,env(safe-area-inset-bottom))] right-4 z-[90] inline-flex transition-all duration-500 ${fab ? "" : "pointer-events-none translate-y-6 opacity-0"} items-center gap-2 rounded-full bg-pearl/90 px-5 py-3.5 text-plum shadow-xl backdrop-blur md:hidden`}
       >
         <Spark className="h-4 w-4" /> Stylist
       </button>

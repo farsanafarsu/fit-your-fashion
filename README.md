@@ -29,7 +29,8 @@ Next.js (App Router) · React · Tailwind CSS v4 · GSAP + ScrollTrigger · Leni
 
 ## Placeholders to replace before launch
 
-- **Hero & campaign films**: set `MEDIA.heroFilm.landscape/portrait` and `MEDIA.campaignFilm` in `lib/catalog.js`. Until then a generative WebGL silk film stands in. Captions: `public/media/hero-captions.vtt`.
+- **Hero models**: the hero is a cut-out model carousel (`components/sections/Hero.jsx`, `LOOKS`). The six models in `public/models/` are free Unsplash stock with backgrounds removed — see `public/models/CREDITS.md`. Replace with your own campaign shoot (transparent WebP/PNG, full or 3/4 length) and signed model releases.
+- **Campaign film**: set `MEDIA.campaignFilm` in `lib/catalog.js` for Shop the Film. Captions: `public/media/hero-captions.vtt`.
 - **Product photography**: `GarmentArt` draws labelled silhouettes; replace with front + second-angle photos.
 - **Prices** (`₹ XX,XXX`), **size chart**, social links, newsletter provider, soundtrack.
 - **UGC wall**: tiles are empty slots for real, consented customer looks. No reviews or stats are invented anywhere.
