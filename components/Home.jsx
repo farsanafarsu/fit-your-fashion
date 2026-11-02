@@ -4,6 +4,7 @@ import Intro from "./Intro";
 import Reveals from "./Reveals";
 import Hero from "./sections/Hero";
 import Collection from "./sections/Collection";
+import Ticker from "./sections/Ticker";
 import DressingChapter from "./sections/DressingChapter";
 import StylistChapter from "./sections/StylistChapter";
 import Atelier from "./sections/Atelier";
@@ -20,6 +21,7 @@ export default function Home() {
       <Intro onDone={() => setReady(true)} />
       <main id="main">
         <Hero ready={ready} />
+        <Ticker />
         <Collection />
         <DressingChapter />
         <StylistChapter />
