@@ -4,7 +4,7 @@ import { ChapterLabel, Spark } from "../ui/primitives";
 
 export default function StylistChapter() {
   return (
-    <section id="stylist" className="relative overflow-hidden bg-white py-28 md:py-40" aria-labelledby="st-h">
+    <section id="stylist" data-chapter="#FFFFFF" className="relative overflow-x-clip py-28 md:py-40" aria-labelledby="st-h">
       <div className="mx-auto grid max-w-[1500px] grid-cols-1 gap-12 px-[var(--gutter)] *:min-w-0 md:gap-14 lg:grid-cols-2 lg:items-center">
         <div data-reveal="wipe">
           <ChapterLabel n="03" title="Your AI Stylist" />

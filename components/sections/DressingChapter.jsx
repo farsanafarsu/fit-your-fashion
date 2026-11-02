@@ -33,7 +33,7 @@ export default function DressingChapter() {
   const sizes = Object.fromEntries(items.map((id) => [id, predictSize(byId(id), body, returnHistory).size]));
 
   return (
-    <section ref={ref} id="dressing-room" className="on-dark relative overflow-hidden bg-plum py-28 text-pearl md:py-40" aria-labelledby="dr-h">
+    <section ref={ref} id="dressing-room" data-chapter="#1E1530" className="on-dark relative overflow-x-clip py-28 text-pearl md:py-40" aria-labelledby="dr-h">
       <div className="pointer-events-none absolute left-1/2 top-1/3 h-[60vmax] w-[60vmax] -translate-x-1/2 rounded-full bg-amethyst/30 blur-[140px]" aria-hidden />
       <div className="relative mx-auto grid max-w-[1500px] grid-cols-1 items-center gap-12 px-[var(--gutter)] *:min-w-0 md:gap-14 lg:grid-cols-[1fr_1.1fr]">
         <div>

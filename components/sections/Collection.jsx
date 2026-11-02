@@ -155,7 +155,6 @@ export default function Collection() {
 
         // Giant outline type drifts at a third of the strip's speed.
         gsap.to(".c-bg", { x: () => -dist() * 0.35, ease: "none", scrollTrigger: st });
-        gsap.to(".c-progress", { scaleX: 1, ease: "none", scrollTrigger: { ...st, scrub: true } });
 
         gsap.utils.toArray(".c-panel").forEach((el, i) => {
           // depth: panels float at different rates
@@ -175,7 +174,7 @@ export default function Collection() {
   return (
     <div>
       {/* own wrapper: GSAP inserts its pin-spacer here, outside React's sibling list */}
-      <section id="collection" ref={root} className="relative overflow-hidden bg-pearl py-20 md:flex md:h-screen md:items-center md:py-0" aria-labelledby="col-h">
+      <section id="collection" ref={root} data-chapter="#FAF8FD" className="relative overflow-hidden py-20 md:flex md:h-screen md:items-center md:py-0" aria-labelledby="col-h">
         {/* drifting outline type behind the strip (CSS marquee on touch, scroll-linked on desktop) */}
         <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center overflow-visible" aria-hidden>
           <div className="c-bg flex whitespace-nowrap max-md:animate-[pan_50s_linear_infinite] motion-reduce:animate-none">
@@ -219,9 +218,6 @@ export default function Collection() {
           <div className="w-[6vw] shrink-0" aria-hidden />
         </div>
 
-        <div className="absolute bottom-8 left-[var(--gutter)] right-[var(--gutter)] hidden h-px bg-plum/10 md:block" aria-hidden>
-          <div className="c-progress h-full origin-left scale-x-0 bg-amethyst" />
-        </div>
       </section>
     </div>
   );

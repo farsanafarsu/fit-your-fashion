@@ -28,7 +28,7 @@ export default function ShopTheFilm() {
   const { addToBag } = useApp();
 
   return (
-    <section className="on-dark relative bg-plum py-24 text-pearl md:py-32" aria-labelledby="sf-h">
+    <section data-chapter="#1E1530" className="on-dark relative py-24 text-pearl md:py-32" aria-labelledby="sf-h">
       <div className="mx-auto max-w-[1500px] px-[var(--gutter)]">
         <div className="flex flex-col justify-between gap-6 md:flex-row md:items-end">
           <div>

@@ -209,7 +209,7 @@ export default function Atelier() {
   const [tool, setTool] = useState("colour");
   const T = TOOLS.find((t) => t.id === tool);
   return (
-    <section id="atelier" className="relative bg-pearl py-24 md:py-32" aria-labelledby="at-h">
+    <section id="atelier" data-chapter="#FAF8FD" className="relative py-24 md:py-32" aria-labelledby="at-h">
       <div className="mx-auto max-w-[1500px] px-[var(--gutter)]">
         <div className="flex flex-col justify-between gap-6 md:flex-row md:items-end">
           <div>

@@ -35,7 +35,8 @@ html.lenis, html.lenis body { height: auto; }
 .lenis.lenis-stopped { overflow: hidden; }
 
 body {
-  background: var(--color-pearl);
+  /* transparent so the homepage Backdrop (fixed, z -10) shows through; html keeps the pearl ground */
+  background: transparent;
   color: var(--color-plum);
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;

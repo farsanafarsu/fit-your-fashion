@@ -2,6 +2,7 @@
 import { useState } from "react";
 import Intro from "./Intro";
 import Reveals from "./Reveals";
+import Backdrop from "./Backdrop";
 import Hero from "./sections/Hero";
 import Collection from "./sections/Collection";
 import Ticker from "./sections/Ticker";
@@ -18,6 +19,7 @@ export default function Home() {
   const [ready, setReady] = useState(false);
   return (
     <>
+      <Backdrop />
       <Intro onDone={() => setReady(true)} />
       <main id="main">
         <Hero ready={ready} />

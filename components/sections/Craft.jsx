@@ -38,9 +38,9 @@ export default function Craft() {
   return (
     <div>
       {/* own wrapper: GSAP inserts its pin-spacer here, outside React's sibling list */}
-    <section id="story" ref={root} className="on-dark relative h-screen overflow-hidden bg-plum motion-reduce:h-auto motion-reduce:py-32 text-pearl" aria-labelledby="cr-h">
+    <section id="story" ref={root} data-chapter="#1E1530" className="on-dark relative h-screen overflow-hidden motion-reduce:h-auto motion-reduce:py-32 text-pearl" aria-labelledby="cr-h">
       {/* background set */}
-      <div className="cr-bg absolute inset-[-10%] bg-[radial-gradient(ellipse_at_30%_40%,#3a2b5c,transparent_60%),radial-gradient(ellipse_at_80%_70%,#2a1f44,#1e1530)]" aria-hidden>
+      <div className="cr-bg absolute inset-[-10%] [mask-image:linear-gradient(to_bottom,transparent,black_22%,black_78%,transparent)] bg-[radial-gradient(ellipse_at_30%_40%,#3a2b5c,transparent_60%),radial-gradient(ellipse_at_80%_70%,#2a1f44,#1e1530)]" aria-hidden>
         <div className="absolute left-[8%] top-0 h-full w-px bg-gradient-to-b from-transparent via-lavender/30 to-transparent" />
         <div className="absolute left-[62%] top-0 h-full w-px bg-gradient-to-b from-transparent via-lavender/20 to-transparent" />
       </div>

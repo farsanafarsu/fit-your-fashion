@@ -38,7 +38,7 @@ export default function Ticker() {
 
   const items = [...WORDS, ...WORDS];
   return (
-    <div ref={root} className="relative overflow-hidden border-y border-plum/10 bg-pearl py-5 sm:py-7" aria-label="Fabrics in this collection">
+    <div ref={root} data-chapter="#FAF8FD" className="relative overflow-hidden py-5 sm:py-7" aria-label="Fabrics in this collection">
       <div ref={row} className="flex w-max items-center">
         {items.map((w, i) => (
           <span key={i} className="flex shrink-0 items-center" aria-hidden={i >= WORDS.length}>

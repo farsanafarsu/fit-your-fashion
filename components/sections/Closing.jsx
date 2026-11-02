@@ -9,7 +9,7 @@ import { Button, Scramble } from "../ui/primitives";
 export function UGCWall() {
   const tiles = PRODUCTS.slice(0, 8);
   return (
-    <section className="overflow-hidden bg-pearl py-24 md:py-32" aria-labelledby="ugc-h">
+    <section data-chapter="#FAF8FD" className="overflow-hidden py-24 md:py-32" aria-labelledby="ugc-h">
       <div className="mx-auto max-w-[1500px] px-[var(--gutter)] text-center">
         <p className="label text-amethyst">Worn by you</p>
         <h2 id="ugc-h" className="display mx-auto mt-6 max-w-4xl text-[12vw] sm:text-[8vw] lg:text-[5.5vw]">The Inner Circle, <span className="display-i">in the mirror.</span></h2>
@@ -36,7 +36,7 @@ export function Newsletter() {
   const [email, setEmail] = useState("");
   const [done, setDone] = useState(false);
   return (
-    <section className="on-dark relative overflow-hidden bg-plum-2 py-28 text-pearl md:py-40" aria-labelledby="nl-h">
+    <section data-chapter="#2A1F44" className="on-dark relative overflow-x-clip py-28 text-pearl md:py-40" aria-labelledby="nl-h">
       <div className="pointer-events-none absolute left-1/2 top-1/2 h-[50vmax] w-[50vmax] -translate-x-1/2 -translate-y-1/2 rounded-full bg-amethyst/40 blur-[160px]" aria-hidden />
       <div className="relative mx-auto max-w-3xl px-[var(--gutter)] text-center">
         <p className="label text-lavender">Early access</p>
@@ -71,7 +71,7 @@ export function Footer() {
     House: [["Our craft", "/#story"], ["Style guide", "/style-guide"], ["Privacy & your photos", "/#atelier"]],
   };
   return (
-    <footer className="on-dark overflow-hidden bg-plum pb-6 pt-24 text-pearl">
+    <footer data-chapter="#1E1530" className="on-dark overflow-hidden pb-6 pt-24 text-pearl">
       <div className="mx-auto grid max-w-[1500px] grid-cols-2 gap-x-6 gap-y-10 px-[var(--gutter)] sm:grid-cols-3 lg:grid-cols-[1.4fr_repeat(3,1fr)] lg:gap-12">
         <p className="display-i col-span-2 max-w-xs text-[26px] leading-tight text-mist sm:col-span-3 sm:text-[28px] lg:col-span-1">A fashion film where an intelligent stylist dresses you.</p>
         {Object.entries(cols).map(([h, links]) => (

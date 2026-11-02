@@ -15,7 +15,7 @@ export default function PickedForYou() {
   const why = topMood ? `Because you’re drawn to ${MOODS.find((m) => m.id === topMood)?.name}.` : "Explore a little — this rail learns from what you linger on.";
 
   return (
-    <section className="bg-white py-24 md:py-32" aria-labelledby="pk-h">
+    <section data-chapter="#FFFFFF" className="py-24 md:py-32" aria-labelledby="pk-h">
       <div className="mx-auto flex max-w-[1500px] flex-col justify-between gap-4 px-[var(--gutter)] md:flex-row md:items-end">
         <div>
           <p className="label flex items-center gap-2 text-amethyst"><Spark className="h-3.5 w-3.5" /> AI-curated</p>
