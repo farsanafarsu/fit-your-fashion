@@ -55,7 +55,7 @@ const LOOKS = [
   },
 ];
 const AUTOPLAY_MS = 7000;
-const SCROLL_PER_LOOK = 0.85; // viewport heights of scrolling spent on each look while the hero is pinned
+const SCROLL_PER_LOOK = 0.55; // viewport heights of scrolling spent on each look while the hero is pinned
 const ease = [0.22, 1, 0.36, 1];
 const curtain = [0.76, 0, 0.24, 1];
 const pad = (n) => String(n).padStart(2, "0");

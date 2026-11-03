@@ -204,7 +204,7 @@ export default function Collection() {
       const mm = gsap.matchMedia();
       mm.add("(min-width: 768px) and (prefers-reduced-motion: no-preference)", () => {
         const dist = () => track.current.scrollWidth - window.innerWidth;
-        const st = { trigger: root.current, start: "top top", end: () => "+=" + dist(), scrub: 1, invalidateOnRefresh: true };
+        const st = { trigger: root.current, start: "top top", end: () => "+=" + dist(), scrub: 0.6, invalidateOnRefresh: true };
 
         // Lean with scroll velocity, then settle — makes the strip feel continuous rather than stepped.
         const skew = gsap.quickSetter(".c-skew", "skewX", "deg");

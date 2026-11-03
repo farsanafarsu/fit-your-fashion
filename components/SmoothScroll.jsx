@@ -19,7 +19,7 @@ export default function SmoothScroll({ children }) {
 
   useEffect(() => {
     if (prefersReducedMotion()) return; // native scrolling for the calm version
-    const l = new Lenis({ lerp: 0.075, wheelMultiplier: 0.9, touchMultiplier: 1.4 });
+    const l = new Lenis({ lerp: 0.13, wheelMultiplier: 1.25, touchMultiplier: 1.8 });
     l.on("scroll", ScrollTrigger.update);
     const tick = (t) => l.raf(t * 1000);
     gsap.ticker.add(tick);

@@ -2,16 +2,28 @@
 import { useEffect, useRef, useState } from "react";
 import { gsap } from "gsap";
 import { useLenis } from "./SmoothScroll";
-import Signature from "./ui/Signature";
-
 const NAME = "FIT YOUR FASHION";
 
-// Opening (first visit per session, ~4.5s): a lavender point opens into concentric circle wipes —
-// plum, lavender, pearl — the wordmark rises and the brand signature writes itself beneath it. Once
+// Line-art garments for the opening rail, each drawn on a 100×140 hanger with the hook at (50, 2).
+const HANGER = "M50 2c5 0 7 3 7 6c0 4-4 5-7 7v5M50 20L12 34H88Z";
+const GARMENTS = [
+  { name: "dress", fill: "var(--color-lavender)", d: "M38 32Q50 40 62 32L70 35L64 60Q60 67 62 72L82 132Q50 140 18 132L38 72Q40 67 36 60L30 35Z", detail: "M36 72Q50 77 64 72" },
+  { name: "blazer", fill: "var(--color-plum)", d: "M34 32L50 52L66 32L86 39L92 114L76 116L72 70L72 128H28L28 70L24 116L8 114L14 39Z", detail: "M50 52L43 84M50 52L57 84M50 92v.5M50 104v.5" },
+  { name: "blouse", fill: "var(--color-mist)", d: "M38 32Q50 42 62 32L88 43L80 64L70 58L72 120H28L30 58L20 64L12 43Z", detail: "M50 40v78" },
+  { name: "skirt", fill: "var(--color-amethyst)", d: "M28 36H72L90 128Q50 136 10 128Z", detail: "M40 36L31 129M50 36V132M60 36L69 129" },
+  { name: "trench", fill: "var(--color-lavender)", d: "M34 32L50 48L66 32L84 39L90 104L76 106L74 70L76 136H24L26 70L24 106L10 104L16 39Z", detail: "M26 84H74M50 48V136" },
+];
+
+// Module state lives for one page load: the opening plays on every load/refresh, but not again when
+// the visitor navigates back to the homepage inside the site.
+let playedThisLoad = false;
+
+// Opening (every page load, ~4.5s): a lavender point opens into concentric circle wipes —
+// plum, lavender, pearl — the wordmark rises and a clothes rail swings in beneath it, each garment
+// sketching itself in line before it fills with colour. Once
 // the page has loaded, the wordmark glides into the header logo's place while the curtain lifts.
 export default function Intro({ onDone }) {
   const root = useRef(null);
-  const sig = useRef(null);
   const [gone, setGone] = useState(false);
   const lenis = useLenis();
 
@@ -21,17 +33,16 @@ export default function Intro({ onDone }) {
   }, [lenis, gone]);
 
   useEffect(() => {
-    let seen = false;
-    try { seen = sessionStorage.getItem("fyf:intro") === "1"; } catch {}
-    if (seen) {
+    if (playedThisLoad) {
       setGone(true);
       onDone?.();
       return;
     }
     const q = gsap.utils.selector(root);
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    // marked on finish, not start: strict mode re-runs this effect once in development
     const finish = () => {
-      try { sessionStorage.setItem("fyf:intro", "1"); } catch {}
+      playedThisLoad = true;
       setGone(true);
     };
     const loaded = new Promise((r) => {
@@ -47,7 +58,6 @@ export default function Intro({ onDone }) {
       if (exiting) return;
       exiting = true;
       intro?.progress(1);
-      sig.current?.finish();
       onDone?.();
       const word = q(".word")[0];
       const target = document.querySelector('header a[aria-label="Fit Your Fashion home"] span');
@@ -70,8 +80,8 @@ export default function Intro({ onDone }) {
 
     if (reduce) {
       gsap.set(q(".circle"), { scale: 1 });
-      gsap.set(q(".ch, .tag"), { opacity: 1 });
-      sig.current?.finish();
+      gsap.set(q(".ch, .tag, .rail, .garment, .g-fill"), { opacity: 1 });
+      gsap.set(q(".rail"), { scaleX: 1 });
       Promise.all([loaded, new Promise((r) => setTimeout(r, 900))]).then(() => {
         onDone?.();
         gsap.to(root.current, { opacity: 0, duration: 0.5, onComplete: finish });
@@ -87,7 +97,13 @@ export default function Intro({ onDone }) {
         .fromTo(q(".c3"), { scale: 0 }, { scale: 1, duration: 1.05, ease: "expo.inOut" }, 1.4)
         .fromTo(q(".ch"), { yPercent: 115, opacity: 0 }, { yPercent: 0, opacity: 1, duration: 0.9, ease: "expo.out", stagger: 0.035 }, 2.0)
         .fromTo(q(".tag"), { opacity: 0, letterSpacing: "0.8em" }, { opacity: 1, letterSpacing: "0.42em", duration: 1.1, ease: "expo.out" }, 2.4)
-        .add(() => sig.current?.play(), 2.4)
+        .fromTo(q(".rail"), { scaleX: 0, opacity: 1 }, { scaleX: 1, duration: 0.8, ease: "expo.inOut" }, 2.2)
+        // hangers drop onto the rail and swing to rest from the hook
+        .fromTo(q(".garment"), { y: -60, rotation: (i) => (i % 2 ? 14 : -14), opacity: 0 },
+          { y: 0, rotation: 0, opacity: 1, duration: 1.4, ease: "elastic.out(1, 0.45)", stagger: 0.11 }, 2.5)
+        .fromTo(q(".g-line"), { strokeDashoffset: 1 }, { strokeDashoffset: 0, duration: 1.1, ease: "power2.inOut", stagger: 0.05 }, 2.55)
+        .fromTo(q(".g-fill"), { opacity: 0 }, { opacity: 1, duration: 0.7, ease: "power1.out", stagger: 0.11 }, 3.4)
+        .to(q(".garment"), { rotation: (i) => (i % 2 ? -2.5 : 2.5), duration: 1.6, ease: "sine.inOut", yoyo: true, repeat: 1, stagger: 0.08 }, 3.9)
         .fromTo(q(".meta"), { opacity: 0 }, { opacity: 1, duration: 0.6 }, 0.4)
         .to(count, { v: 100, duration: 4.4, ease: "power1.inOut", onUpdate: () => { const n = q(".count")[0]; if (n) n.textContent = String(Math.round(count.v)).padStart(3, "0"); } }, 0)
         .addLabel("signed", 4.9);
@@ -133,7 +149,19 @@ export default function Intro({ onDone }) {
             </span>
           </div>
           <p className="tag fade-out label-sm mt-2 text-[9px] text-amethyst opacity-0 sm:text-[11px]">AI couture atelier</p>
-          <Signature ref={sig} trigger="manual" className="fade-out -mt-1 h-[30vw] w-auto -rotate-[4deg] text-amethyst sm:h-[min(15vw,200px)]" />
+          <div className="fade-out relative mt-8 w-[min(86vw,620px)] sm:mt-10" aria-hidden>
+            <div className="rail h-[3px] origin-left rounded-full bg-plum opacity-0" style={{ transform: "scaleX(0)" }} />
+            <div className="-mt-[2px] flex justify-between px-[4%]">
+              {GARMENTS.map((g) => (
+                <svg key={g.name} viewBox="0 0 100 140" className="garment w-[17%] overflow-visible opacity-0" style={{ transformOrigin: "50% 1.4%" }}>
+                  <path className="g-fill" d={g.d} fill={g.fill} fillOpacity={g.fill.includes("plum") ? 0.9 : 0.75} opacity="0" />
+                  <path className="g-line" d={HANGER} pathLength="1" strokeDasharray="1" fill="none" stroke="var(--color-plum)" strokeWidth="2" strokeLinejoin="round" strokeLinecap="round" vectorEffect="non-scaling-stroke" />
+                  <path className="g-line" d={g.d} pathLength="1" strokeDasharray="1" fill="none" stroke="var(--color-plum)" strokeWidth="1.5" strokeLinejoin="round" vectorEffect="non-scaling-stroke" />
+                  <path className="g-line" d={g.detail} pathLength="1" strokeDasharray="1" fill="none" stroke={g.fill.includes("plum") ? "var(--color-lavender)" : "var(--color-plum)"} strokeWidth="1.2" strokeLinecap="round" vectorEffect="non-scaling-stroke" />
+                </svg>
+              ))}
+            </div>
+          </div>
         </div>
       </div>
 

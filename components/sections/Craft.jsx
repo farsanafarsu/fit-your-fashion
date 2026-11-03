@@ -20,7 +20,7 @@ export default function Craft() {
       const mm = gsap.matchMedia();
       mm.add("(prefers-reduced-motion: no-preference)", () => {
         const frames = gsap.utils.toArray(".cr-frame");
-        const tl = gsap.timeline({ scrollTrigger: { trigger: root.current, start: "top top", end: "+=" + window.innerHeight * 2.4, pin: true, scrub: 1 } });
+        const tl = gsap.timeline({ scrollTrigger: { trigger: root.current, start: "top top", end: "+=" + window.innerHeight * 1.5, pin: true, scrub: 0.6 } });
         frames.forEach((f, i) => {
           if (i === 0) return;
           tl.to(frames[i - 1], { opacity: 0, scale: 1.08, duration: 1 }, i)
