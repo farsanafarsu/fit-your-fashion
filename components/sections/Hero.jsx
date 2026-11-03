@@ -211,8 +211,8 @@ export default function Hero({ ready }) {
         }
         // (the headline itself rises with framer once `ready`, so it can also swap per look)
         gsap.timeline()
-          .fromTo(".h-arrive", { clipPath: "inset(100% 0% 0% 0%)" }, { clipPath: "inset(0% 0% 0% 0%)", duration: 1.6, ease: "expo.inOut", stagger: 0.12 }, 0)
-          .fromTo(".h-fade", { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 1, ease: "expo.out", stagger: 0.07 }, 1.1);
+          .fromTo(".h-arrive", { clipPath: "inset(100% 0% 0% 0%)" }, { clipPath: "inset(0% 0% 0% 0%)", duration: 1.1, ease: "expo.inOut", stagger: 0.08 }, 0)
+          .fromTo(".h-fade", { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.8, ease: "expo.out", stagger: 0.05 }, 0.5);
 
         if (window.matchMedia("(pointer: fine)").matches) {
           const layers = [[".h-left", 10], [".h-right", -10], [".h-type", -14]].map(([s, k]) => ({

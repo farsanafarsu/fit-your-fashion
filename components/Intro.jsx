@@ -18,7 +18,7 @@ const GARMENTS = [
 // the visitor navigates back to the homepage inside the site.
 let playedThisLoad = false;
 
-// Opening (every page load, ~4.5s): a lavender point opens into concentric circle wipes —
+// Opening (every page load, ~4s): a lavender point opens into concentric circle wipes —
 // plum, lavender, pearl — the wordmark rises and a clothes rail swings in beneath it, each garment
 // sketching itself in line before it fills with colour. Once
 // the page has loaded, the wordmark glides into the header logo's place while the curtain lifts.
@@ -48,7 +48,7 @@ export default function Intro({ onDone }) {
     const loaded = new Promise((r) => {
       if (document.readyState === "complete") r();
       else window.addEventListener("load", r, { once: true });
-      setTimeout(r, 6000); // never hold the page hostage to a slow asset
+      setTimeout(r, 2500); // never hold the page hostage to a slow asset; the hero's first look is preloaded
     });
     let exiting = false;
     let intro;
@@ -97,17 +97,16 @@ export default function Intro({ onDone }) {
         .fromTo(q(".c3"), { scale: 0 }, { scale: 1, duration: 1.05, ease: "expo.inOut" }, 1.4)
         .fromTo(q(".ch"), { yPercent: 115, opacity: 0 }, { yPercent: 0, opacity: 1, duration: 0.9, ease: "expo.out", stagger: 0.035 }, 2.0)
         .fromTo(q(".tag"), { opacity: 0, letterSpacing: "0.8em" }, { opacity: 1, letterSpacing: "0.42em", duration: 1.1, ease: "expo.out" }, 2.4)
-        .fromTo(q(".rail"), { scaleX: 0, opacity: 1 }, { scaleX: 1, duration: 0.8, ease: "expo.inOut" }, 2.2)
+        .fromTo(q(".rail"), { scaleX: 0, opacity: 1 }, { scaleX: 1, duration: 0.7, ease: "expo.inOut" }, 2.0)
         // hangers drop onto the rail and swing to rest from the hook
         .fromTo(q(".garment"), { y: -60, rotation: (i) => (i % 2 ? 14 : -14), opacity: 0 },
-          { y: 0, rotation: 0, opacity: 1, duration: 1.4, ease: "elastic.out(1, 0.45)", stagger: 0.11 }, 2.5)
-        .fromTo(q(".g-line"), { strokeDashoffset: 1 }, { strokeDashoffset: 0, duration: 1.1, ease: "power2.inOut", stagger: 0.05 }, 2.55)
-        .fromTo(q(".g-fill"), { opacity: 0 }, { opacity: 1, duration: 0.7, ease: "power1.out", stagger: 0.11 }, 3.4)
-        .to(q(".garment"), { rotation: (i) => (i % 2 ? -2.5 : 2.5), duration: 1.6, ease: "sine.inOut", yoyo: true, repeat: 1, stagger: 0.08 }, 3.9)
+          { y: 0, rotation: 0, opacity: 1, duration: 1.3, ease: "elastic.out(1, 0.45)", stagger: 0.09 }, 2.2)
+        .fromTo(q(".g-line"), { strokeDashoffset: 1 }, { strokeDashoffset: 0, duration: 0.9, ease: "power2.inOut", stagger: 0.04 }, 2.25)
+        .fromTo(q(".g-fill"), { opacity: 0 }, { opacity: 1, duration: 0.5, ease: "power1.out", stagger: 0.08 }, 3.0)
         .fromTo(q(".meta"), { opacity: 0 }, { opacity: 1, duration: 0.6 }, 0.4)
-        .to(count, { v: 100, duration: 4.4, ease: "power1.inOut", onUpdate: () => { const n = q(".count")[0]; if (n) n.textContent = String(Math.round(count.v)).padStart(3, "0"); } }, 0)
-        .addLabel("signed", 4.9);
-      // leave once both the signing has finished and the page has loaded
+        .to(count, { v: 100, duration: 3.8, ease: "power1.inOut", onUpdate: () => { const n = q(".count")[0]; if (n) n.textContent = String(Math.round(count.v)).padStart(3, "0"); } }, 0)
+        .addLabel("hung", 4.0);
+      // leave once both the rail is dressed and the page has loaded
       Promise.all([new Promise((r) => intro.eventCallback("onComplete", r)), loaded]).then(exit);
     }
 
