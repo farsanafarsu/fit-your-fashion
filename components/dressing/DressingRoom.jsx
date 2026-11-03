@@ -215,7 +215,7 @@ export default function DressingRoom() {
 
 
   return (
-    <div className={`min-h-[100svh] pt-20 ${campaign ? "bg-plum text-pearl" : "bg-pearl"}`}>
+    <div className={`min-h-[100svh] pt-28 ${campaign ? "bg-plum text-pearl" : "bg-pearl"}`}>
       {/* Phone: stage → wardrobe → avatar. Tablet: sticky stage beside the panels. xl: three columns. */}
       <div className="mx-auto grid max-w-[1700px] grid-cols-1 gap-3 px-3 pb-24 sm:gap-4 sm:px-5 md:grid-cols-[minmax(0,1fr)_340px] md:pb-6 xl:h-[calc(100svh-5.5rem)] xl:grid-cols-[320px_minmax(0,1fr)_360px]">
         {/* Avatar */}

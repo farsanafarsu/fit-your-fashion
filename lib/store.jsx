@@ -44,6 +44,8 @@ export function AppProvider({ children }) {
   const [sound, setSound] = usePersisted("sound", false);
   const [panel, setPanel] = useState(null); // 'stylist' | 'bag' | 'search' | 'wishlist' | null
   const [mood, setMood] = useState(null);
+  const [ask, setAsk] = useState(null); // a question handed to the stylist panel from elsewhere on the page
+  const [shopCat, setShopCat] = useState("all"); // shop grid filter, also set by the category tiles
 
   const addToBag = useCallback((id, size = "M") => setBag((b) => [...b.filter((x) => x.id !== id), { id, size }]), [setBag]);
   const removeFromBag = useCallback((id) => setBag((b) => b.filter((x) => x.id !== id)), [setBag]);
@@ -52,6 +54,8 @@ export function AppProvider({ children }) {
   const noteView = useCallback((id) => setViewed((v) => [id, ...v.filter((x) => x !== id)].slice(0, 12)), [setViewed]);
   const saveLook = useCallback((look) => setLookbook((l) => [{ ...look, at: Date.now() }, ...l].slice(0, 24)), [setLookbook]);
   const removeLook = useCallback((at) => setLookbook((l) => l.filter((x) => x.at !== at)), [setLookbook]);
+  const askStylist = useCallback((text) => { setAsk(text); setPanel("stylist"); }, []);
+  const clearAsk = useCallback(() => setAsk(null), []);
 
   const topMood = useMemo(() => Object.entries(moodWeights).sort((a, b) => b[1] - a[1])[0]?.[0] ?? null, [moodWeights]);
 
@@ -68,6 +72,7 @@ export function AppProvider({ children }) {
     body, setBody, returnHistory, setReturnHistory,
     moodWeights, noteMood, topMood, viewed, noteView,
     sound, setSound, panel, setPanel, mood, setMood,
+    ask, askStylist, clearAsk, shopCat, setShopCat,
   };
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
 }

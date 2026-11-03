@@ -11,8 +11,8 @@
   --color-plum-2: #2a1f44;
   --color-ink-soft: #5b5170; /* body text on light, 7:1 on pearl */
 
-  --font-display: var(--font-bodoni), "Bodoni Moda", Didot, serif;
-  --font-sans: var(--font-jost), "Jost", ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-serif), "Cormorant Garamond", Garamond, serif;
+  --font-sans: var(--font-body), "Manrope", ui-sans-serif, system-ui, sans-serif;
 
   --ease-film: cubic-bezier(0.22, 1, 0.36, 1); /* expo-out: arrivals */
   --ease-curtain: cubic-bezier(0.76, 0, 0.24, 1); /* in-out: cuts & wipes */
@@ -66,10 +66,10 @@ input[type="range"] { height: 28px; }
 /* Component classes live in a layer so Tailwind utilities can override them. */
 @layer components {
 /* ── Type ──────────────────────────────────────────────────────── */
-.display { font-family: var(--font-display); font-weight: 400; letter-spacing: -0.035em; line-height: 0.9; }
-.display-i { font-family: var(--font-display); font-style: italic; letter-spacing: -0.03em; }
-.label { font-size: 11px; letter-spacing: 0.28em; text-transform: uppercase; font-weight: 500; }
-.label-sm { font-size: 10px; letter-spacing: 0.24em; text-transform: uppercase; }
+.display { font-family: var(--font-display); font-weight: 500; letter-spacing: -0.02em; line-height: 0.92; }
+.display-i { font-family: var(--font-display); font-style: italic; font-weight: 400; letter-spacing: -0.015em; }
+.label { font-size: 11px; letter-spacing: 0.24em; text-transform: uppercase; font-weight: 600; }
+.label-sm { font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; font-weight: 500; }
 @media (max-width: 639px) {
   .label { font-size: 11.5px; letter-spacing: 0.22em; }
   .label-sm { font-size: 11px; letter-spacing: 0.18em; }

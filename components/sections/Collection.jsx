@@ -6,7 +6,6 @@ import { gsap } from "gsap";
 import { byId, PRODUCTS } from "@/lib/catalog";
 import ProductCard from "../ProductCard";
 import SilkFilm from "../ui/SilkFilm";
-import Dial from "../ui/Dial";
 import { ChapterLabel, Spark } from "../ui/primitives";
 
 // Chapter 01: a continuous editorial strip. On desktop it is pinned and travels sideways with
@@ -52,6 +51,32 @@ function Arch({ src, w, h, look, name, dark = false, align = "mid" }) {
         <figcaption className="mt-4 flex items-baseline justify-between gap-3">
           <span className="label-sm text-amethyst">Look {look}</span>
           <span className="display-i text-[22px] sm:text-[26px]">{name}</span>
+        </figcaption>
+      </figure>
+    </Panel>
+  );
+}
+
+// Full-colour campaign photograph; the image counter-drifts inside its frame like the arches.
+const PHOTO_W = {
+  m: "w-[72vw] sm:w-[46vw] md:w-[min(34vw,42svh)] lg:w-[min(24vw,42svh)]",
+  l: "w-[78vw] sm:w-[50vw] md:w-[min(40vw,46svh)] lg:w-[min(28vw,46svh)]",
+  wide: "w-[86vw] sm:w-[64vw] md:w-[min(56vw,78svh)] lg:w-[min(44vw,78svh)]",
+};
+function Photo({ src, w, h, title, note, size = "m", align = "mid", aspect = "aspect-[3/4]" }) {
+  return (
+    <Panel align={align} className={PHOTO_W[size]}>
+      <figure>
+        <div className={`c-reveal group relative ${aspect} overflow-hidden rounded-[22px] bg-plum`}>
+          <div className="c-px absolute inset-y-0 left-[-8%] right-[-8%]">
+            <Image src={src} alt={title} width={w} height={h} sizes="(max-width: 768px) 86vw, 44vw" className="h-full w-full object-cover transition-transform duration-[1.4s] ease-[var(--ease-film)] group-hover:scale-[1.05]" />
+          </div>
+          <div className="pointer-events-none absolute inset-2.5 rounded-[16px] border border-white/25" aria-hidden />
+          <span className="label-sm absolute bottom-4 left-4 rounded-full bg-white/70 px-2.5 py-1 text-[10px] text-plum/60 backdrop-blur">Stock placeholder</span>
+        </div>
+        <figcaption className="mt-4 flex items-baseline justify-between gap-3">
+          <span className="label-sm text-amethyst">{note}</span>
+          <span className="display-i text-[22px] sm:text-[26px]">{title}</span>
         </figcaption>
       </figure>
     </Panel>
@@ -106,7 +131,7 @@ function EndCTA() {
       <Link href="/dressing-room" className="c-reveal group relative mx-auto grid aspect-square w-full max-w-[340px] place-items-center" data-cursor="Try on">
         <svg viewBox="0 0 200 200" className="absolute inset-0 h-full w-full motion-safe:animate-[spin_24s_linear_infinite]" aria-hidden>
           <defs><path id="ring" d="M100,100 m-82,0 a82,82 0 1,1 164,0 a82,82 0 1,1 -164,0" /></defs>
-          <text className="fill-plum" style={{ fontSize: 12.5, letterSpacing: "0.32em", textTransform: "uppercase", fontFamily: "var(--font-jost)" }}>
+          <text className="fill-plum" style={{ fontSize: 12.5, letterSpacing: "0.32em", textTransform: "uppercase", fontFamily: "var(--font-body)" }}>
             <textPath href="#ring">Try every piece on ✦ Your avatar, your size ✦ </textPath>
           </text>
         </svg>
@@ -119,6 +144,37 @@ function EndCTA() {
         </span>
       </Link>
     </Panel>
+  );
+}
+
+// The opener's feature: the season's couture look on a framed midnight plate.
+function PremiumPlate() {
+  return (
+    <Link href="/dressing-room" data-cursor="Reserve" className="c-plate group relative block aspect-[3/4] w-full overflow-hidden rounded-[28px] bg-gradient-to-b from-plum-2 to-plum text-pearl shadow-[0_40px_90px_-30px_rgba(30,21,48,.6)]">
+      <div className="absolute inset-x-[10%] top-[14%] aspect-square rounded-full bg-amethyst/45 blur-3xl" aria-hidden />
+      <div className="c-plate-img absolute inset-x-0 bottom-0 top-[9%] transition-transform duration-[1.4s] ease-[var(--ease-film)] group-hover:scale-[1.04]">
+        <Image src="/models/midnight-embellished.webp" alt="Moonlit Evening — couture look" width={642} height={1470} sizes="(max-width: 768px) 78vw, 28vw" priority className="mx-auto h-full w-auto object-contain object-bottom" />
+      </div>
+      <div className="absolute inset-x-0 bottom-0 h-[46%] bg-gradient-to-t from-plum via-plum/80 to-transparent" aria-hidden />
+      {/* hairline inner frame */}
+      <div className="pointer-events-none absolute inset-3 rounded-[20px] border border-lavender/25" aria-hidden />
+
+      <div className="absolute inset-x-7 top-7 flex items-center justify-between">
+        <span className="label-sm flex items-center gap-2 text-lavender"><Spark className="h-3.5 w-3.5" animate={false} /> Couture edit</span>
+        <span className="label-sm text-pearl/60">N° 01 / 40</span>
+      </div>
+
+      <div className="absolute inset-x-7 bottom-7">
+        <p className="display-i text-[clamp(30px,3.2vw,46px)] leading-none">Moonlit Evening</p>
+        <div className="mt-4 flex items-end justify-between gap-4 border-t border-lavender/20 pt-4">
+          <p className="label-sm leading-relaxed text-pearl/60">Hand-embroidered<br />120 hours · Limited</p>
+          <span className="label-sm flex items-center gap-2 whitespace-nowrap rounded-full bg-pearl px-4 py-2.5 text-plum transition-colors duration-500 group-hover:bg-lavender">
+            Reserve <span className="transition-transform duration-500 group-hover:translate-x-1">→</span>
+          </span>
+        </div>
+      </div>
+      <span className="label-sm absolute left-1/2 top-[44%] -translate-x-1/2 whitespace-nowrap rounded-full bg-white/10 px-2.5 py-1 text-[10px] text-pearl/50 backdrop-blur">Stock placeholder</span>
+    </Link>
   );
 }
 
@@ -140,10 +196,10 @@ const FACTS = [
 export default function Collection() {
   const root = useRef(null);
   const track = useRef(null);
-  const dial = useRef(null); // docked dial (desktop, pinned)
-  const dialFlow = useRef(null); // in-flow dial (phones, reduced motion)
+  const prog = useRef(null); // journey progress line
 
   useEffect(() => {
+    const setProgress = (p) => prog.current && (prog.current.style.transform = `scaleX(${p})`);
     const ctx = gsap.context(() => {
       const mm = gsap.matchMedia();
       mm.add("(min-width: 768px) and (prefers-reduced-motion: no-preference)", () => {
@@ -162,7 +218,7 @@ export default function Collection() {
             pin: true,
             anticipatePin: 1,
             onUpdate: (self) => {
-              dial.current?.setProgress(self.progress);
+              setProgress(self.progress);
               const s = clamp(self.getVelocity() / -320);
               if (Math.abs(s) > Math.abs(proxy.s)) {
                 proxy.s = s;
@@ -172,19 +228,6 @@ export default function Collection() {
           },
         });
 
-        // The dial starts large beside the title, then shrinks into the bottom-right corner and keeps
-        // time for the rest of the journey (it replaces a progress bar).
-        const d = root.current.querySelector(".c-dial");
-        gsap.fromTo(
-          d,
-          { scale: 1, y: 0 },
-          {
-            scale: () => (window.innerWidth < 1024 ? 0.34 : 0.27),
-            y: () => window.innerHeight / 2 - d.offsetHeight / 2 - 22,
-            ease: "power2.inOut",
-            scrollTrigger: { trigger: root.current, start: "top top", end: () => "+=" + window.innerWidth * 0.75, scrub: 1, invalidateOnRefresh: true },
-          }
-        );
         // the title block leaves a touch faster than the strip, so the opener "lifts off"
         gsap.to(".c-opener-copy", { xPercent: -14, opacity: 0.2, ease: "none", scrollTrigger: { trigger: root.current, start: "top top", end: () => "+=" + window.innerWidth * 0.8, scrub: true } });
 
@@ -203,19 +246,20 @@ export default function Collection() {
         });
       });
 
-      // Opener entrance (every size): letters rise in, "Lavender" unmasks, the dial turns in.
+      // Opener entrance (every size): letters rise in, "Lavender" unmasks, the plate unveils.
       mm.add("(prefers-reduced-motion: no-preference)", () => {
         const tl = gsap.timeline({ scrollTrigger: { trigger: root.current, start: "top 72%", once: true } });
         tl.from(".c-char", { yPercent: 118, rotate: 7, opacity: 0, duration: 1.3, ease: "expo.out", stagger: 0.035 })
           .from(".c-word", { clipPath: "inset(0 100% 0 0)", duration: 1.6, ease: "expo.inOut" }, 0.15)
           .from(".c-fact", { y: 24, opacity: 0, duration: 0.9, ease: "expo.out", stagger: 0.07 }, 0.5)
-          .from(".c-dial-in", { opacity: 0, rotate: -40, scale: 0.86, duration: 1.8, ease: "expo.out" }, 0.1);
+          .from(".c-plate", { clipPath: "inset(100% 0% 0% 0% round 28px)", y: 60, duration: 1.6, ease: "expo.inOut" }, 0.1)
+          .from(".c-plate-img > *", { scale: 1.18, yPercent: 6, duration: 2, ease: "expo.out" }, 0.4);
       });
     }, root);
 
-    // Phones / reduced motion: the in-flow dial follows the swipe row instead.
+    // Phones / reduced motion: the progress line follows the swipe row instead.
     const t = track.current;
-    const onSwipe = () => dialFlow.current?.setProgress(t.scrollLeft / Math.max(1, t.scrollWidth - t.clientWidth));
+    const onSwipe = () => setProgress(t.scrollLeft / Math.max(1, t.scrollWidth - t.clientWidth));
     t.addEventListener("scroll", onSwipe, { passive: true });
     return () => {
       t.removeEventListener("scroll", onSwipe);
@@ -238,13 +282,13 @@ export default function Collection() {
           </div>
         </div>
 
-        <div className="c-dial pointer-events-none absolute right-[var(--gutter)] top-1/2 z-20 hidden w-[min(40vw,66svh)] origin-bottom-right -translate-y-1/2 md:motion-safe:block">
-          <Dial ref={dial} idPrefix="dd" className="c-dial-in" />
+        <div className="pointer-events-none absolute inset-x-[var(--gutter)] bottom-6 z-20 h-px bg-plum/10 md:bottom-8" aria-hidden>
+          <div ref={prog} className="h-full origin-left bg-amethyst" style={{ transform: "scaleX(0)" }} />
         </div>
 
         <div ref={track} className="no-scrollbar relative flex snap-x snap-mandatory scroll-px-[var(--gutter)] items-center gap-6 overflow-x-auto overscroll-x-contain px-[var(--gutter)] pb-6 sm:gap-8 md:h-full md:gap-[5vw] md:pb-0 md:motion-safe:snap-none md:motion-safe:overflow-visible" /* reduced motion: stays a swipe row, no pin */>
-          {/* Opener: full first screen on desktop (title left, dial right — the docked dial lives outside the track) */}
-          <div className="c-opener relative w-[86vw] shrink-0 snap-start sm:w-[72vw] md:w-[calc(100vw-var(--gutter)*2)] md:motion-safe:pr-[min(44vw,74svh)]">
+          {/* Opener: full first screen on desktop (title left, couture plate right) */}
+          <div className="c-opener relative w-[86vw] shrink-0 snap-start sm:w-[72vw] md:flex md:w-[calc(100vw-var(--gutter)*2)] md:items-center md:justify-between md:gap-[5vw]">
             <div className="c-opener-copy max-w-[760px]">
               <ChapterLabel n="01" title="The Collection" />
               <h2 id="col-h" aria-label="The Lavender Hour" className="display mt-6 text-[19vw] leading-[0.84] sm:text-[14vw] md:mt-8 md:text-[min(10.5vw,17svh)]">
@@ -255,7 +299,7 @@ export default function Collection() {
                 <span className="block overflow-hidden pb-[0.04em]"><Letters text="Hour" /></span>
               </h2>
               <p className="c-fact mt-7 max-w-md text-[15px] leading-relaxed text-ink-soft md:text-[16px]">
-                Cut for the minute between dusk and night. Silks that move like breath; tailoring with a pulse. Travel the collection and watch the hour turn.
+                Cut for the minute between dusk and night. Silks that move like breath; tailoring with a pulse. Forty numbered pieces, finished by hand.
               </p>
               <dl className="mt-8 grid max-w-xl grid-cols-3 border-t border-plum/10 sm:grid-cols-[0.6fr_0.6fr_0.9fr_1.7fr]">
                 {FACTS.map(([k, v]) => (
@@ -273,21 +317,24 @@ export default function Collection() {
               </p>
               <p className="label-sm mt-8 text-plum/50 md:motion-safe:hidden">Swipe to travel the hour →</p>
             </div>
-            {/* in-flow dial: phones and reduced motion */}
-            <div className="mt-10 md:motion-safe:hidden">
-              <Dial ref={dialFlow} idPrefix="dm" className="c-dial-in mx-auto w-[min(78vw,420px)]" />
+            <div className="mx-auto mt-10 w-[min(78vw,420px)] shrink-0 md:mx-0 md:mt-0 md:w-[min(28vw,48svh)]">
+              <PremiumPlate />
             </div>
           </div>
 
           <Arch src="/models/ivory-coat.webp" w={611} h={1500} look="01" name="Ivory Tailoring" align="bottom" />
           <Card id="aurora-gown" size="m" align="top" tilt={-1.5} />
-          <Card id="halo-cape" size="l" align="bottom" aspect="aspect-[4/5]" />
+          <Photo src="/editorial/silver-gown.webp" w={1100} h={1650} title="The Silver Hour" note="Evening" size="l" align="bottom" />
+          <Card id="halo-cape" size="l" align="top" aspect="aspect-[4/5]" />
           <Quote />
-          <Card id="nocturne-blazer" size="s" align="top" tilt={2} />
+          <Photo src="/editorial/bridal-runway.webp" w={1100} h={733} title="Bridal Couture" note="Runway" size="wide" aspect="aspect-[3/2]" align="top" />
+          <Card id="nocturne-blazer" size="s" align="bottom" tilt={2} />
+          <Photo src="/editorial/pinstripe-noir.webp" w={1100} h={1650} title="Pinstripe Noir" note="Tailoring" align="top" />
           <FabricStudy />
-          <Arch src="/models/midnight-embellished.webp" w={642} h={1470} look="03" name="Moonlit Evening" dark align="top" />
-          <Card id="vesper-trouser" size="m" align="bottom" />
+          <Photo src="/editorial/lavender-coast.webp" w={1100} h={1375} title="Lavender Coast" note="Day" size="l" aspect="aspect-[4/5]" align="bottom" />
+          <Card id="vesper-trouser" size="m" align="top" />
           <Duo a="lune-slip" b="mist-drape" />
+          <Photo src="/editorial/teal-pinstripe.webp" w={1100} h={1650} title="Studio Teal" note="Backstage" align="bottom" />
           <Card id="cloud-knit" size="l" align="top" tilt={-1} aspect="aspect-[4/5]" />
           <Arch src="/models/sand-suit.webp" w={789} h={1500} look="02" name="Soft Power" align="bottom" />
           <Card id="orbit-skirt" size="m" align="top" />

@@ -1,61 +1,42 @@
 "use client";
 import { useEffect, useRef } from "react";
 import { gsap } from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { MOODS } from "@/lib/catalog";
 import { useApp } from "@/lib/store";
 
-// One continuous page colour instead of section blocks: every [data-chapter] declares its colour and
-// the fixed backdrop blends to it while that chapter's top travels up the screen (scrubbed, so the
-// change is tied to the scroll — no hard edges, no sudden cuts). Hovering a mood tints it too.
+// Section colour without hard cuts. Every [data-chapter] paints its own colour, fading in from the
+// previous chapter's colour across its top padding — so neighbours blend, but a section's text always
+// sits on its own ground (a single shared, scroll-blended backdrop left dark sections half-light while
+// both were on screen). Sections marked [data-tint] stay transparent over this fixed layer, which
+// hovering a mood retints.
+const FIRST_FROM = "#1E1530"; // the hero above the first chapter is midnight plum
+
 export default function Backdrop() {
   const el = useRef(null);
-  const chapter = useRef("#FAF8FD");
   const { mood } = useApp();
 
   useEffect(() => {
-    let triggers = [];
-    const build = () => {
-      triggers.forEach((t) => t.kill());
-      triggers = [];
-      const chapters = gsap.utils.toArray("[data-chapter]");
-      const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const chapters = [...document.querySelectorAll("[data-chapter]")];
+    const paint = () =>
       chapters.forEach((c, i) => {
-        const from = i ? chapters[i - 1].dataset.chapter : "#FAF8FD";
+        if (c.hasAttribute("data-tint")) return;
+        const from = i ? chapters[i - 1].dataset.chapter : FIRST_FROM;
         const to = c.dataset.chapter;
-        if (from === to && i) return;
-        // Light ↔ dark crossings pass through lavender rather than a flat RGB grey.
-        const lum = (h) => parseInt(h.slice(1, 3), 16) + parseInt(h.slice(3, 5), 16) + parseInt(h.slice(5, 7), 16);
-        const viaLavender = Math.abs(lum(from) - lum(to)) > 300;
-        const tween = gsap.timeline({
-            scrollTrigger: {
-              trigger: c,
-              start: "top 92%",
-              end: "top 38%",
-              scrub: reduce ? false : 0.6,
-              toggleActions: reduce ? "play none none reverse" : undefined,
-              onEnter: () => (chapter.current = to),
-              onLeaveBack: () => (chapter.current = from),
-            },
-          })
-          .fromTo(el.current, { backgroundColor: from }, { backgroundColor: viaLavender ? "#A792CC" : to, ease: "none", immediateRender: i === 0 });
-        if (viaLavender) tween.to(el.current, { backgroundColor: to, ease: "none" });
-        triggers.push(tween.scrollTrigger);
+        const fade = Math.min(140, (parseFloat(getComputedStyle(c).paddingTop) || 0) * 0.85);
+        c.style.background = from === to || fade < 8 ? to : `linear-gradient(${from} 0px, ${to} ${fade}px)`;
       });
-      ScrollTrigger.refresh();
-    };
-    // wait one frame so pinned sections have inserted their spacers
-    const id = requestAnimationFrame(build);
+    paint();
+    window.addEventListener("resize", paint); // padding is responsive
     return () => {
-      cancelAnimationFrame(id);
-      triggers.forEach((t) => t.kill());
+      window.removeEventListener("resize", paint);
+      chapters.forEach((c) => (c.style.background = ""));
     };
   }, []);
 
   useEffect(() => {
     const tint = MOODS.find((m) => m.id === mood)?.tint;
-    gsap.to(el.current, { backgroundColor: tint ?? chapter.current, duration: 1.1, ease: "power2.out", overwrite: "auto" });
+    gsap.to(el.current, { backgroundColor: tint ?? "#FFFFFF", duration: 1.1, ease: "power2.out", overwrite: "auto" });
   }, [mood]);
 
-  return <div ref={el} className="pointer-events-none fixed inset-0 -z-10" style={{ backgroundColor: "#FAF8FD" }} aria-hidden />;
+  return <div ref={el} className="pointer-events-none fixed inset-0 -z-10" style={{ backgroundColor: "#FFFFFF" }} aria-hidden />;
 }

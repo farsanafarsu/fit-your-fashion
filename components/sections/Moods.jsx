@@ -14,7 +14,8 @@ export default function Moods() {
   return (
     <section
       id="moods"
-      data-chapter="#FFFFFF" /* hovering a mood retints the page backdrop itself (see Backdrop) */
+      data-chapter="#FFFFFF"
+      data-tint /* transparent: hovering a mood retints the page backdrop itself (see Backdrop) */
       className="relative overflow-hidden py-24 transition-colors duration-[1200ms] md:py-36"
       style={{ color: active?.id === "moonlit" ? "#FAF8FD" : "#1E1530" }}
       aria-labelledby="mo-h"

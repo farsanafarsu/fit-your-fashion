@@ -4,6 +4,7 @@ import { useState } from "react";
 import { PRODUCTS } from "@/lib/catalog";
 import GarmentArt from "../ui/GarmentArt";
 import { Button, Scramble } from "../ui/primitives";
+import Signature from "../ui/Signature";
 
 // Social proof: a wall reserved for real, consented customer try-on looks. No invented reviews.
 export function UGCWall() {
@@ -66,8 +67,8 @@ export function Newsletter() {
 
 export function Footer() {
   const cols = {
-    Shop: [["The Collection", "/#collection"], ["Shop by mood", "/#moods"], ["Picked for you", "/#collection"]],
-    "AI Atelier": [["Dressing Room", "/dressing-room"], ["Stylist", "/#stylist"], ["Colour Analysis", "/#atelier"], ["Visual Search", "/#atelier"]],
+    Shop: [["Shop by category", "/#categories"], ["Shop the edit", "/#shop"], ["The Collection", "/#collection"], ["Shop by mood", "/#moods"], ["Complete the look", "/#looks"]],
+    "AI Atelier": [["Dressing Room", "/dressing-room"], ["Fit Finder", "/#fit"], ["Stylist", "/#stylist"], ["Colour Analysis", "/#atelier"], ["Visual Search", "/#atelier"]],
     House: [["Our craft", "/#story"], ["Style guide", "/style-guide"], ["Privacy & your photos", "/#atelier"]],
   };
   return (
@@ -88,6 +89,11 @@ export function Footer() {
       <div className="mx-auto mt-20 flex max-w-[1500px] flex-wrap justify-between gap-4 px-[var(--gutter)] text-[11px] text-mist/50">
         <span>© {new Date().getFullYear()} Fit Your Fashion</span>
         <span>Instagram · Pinterest · YouTube (links placeholder)</span>
+      </div>
+      {/* the house signs off: the signature writes itself as the footer comes into view */}
+      <div className="mt-16 flex flex-col items-center gap-2 px-[var(--gutter)]">
+        <p className="label-sm text-lavender/70">With love, from the atelier</p>
+        <Signature className="h-[24vw] w-auto -rotate-[4deg] text-lavender sm:h-[13vw] lg:h-[min(10vw,170px)]" />
       </div>
       <p className="display mt-6 select-none whitespace-nowrap text-center text-[10.8vw] leading-[0.78] tracking-[-0.05em] text-pearl/95" aria-hidden data-reveal="wipe">
         FIT YOUR FASHION

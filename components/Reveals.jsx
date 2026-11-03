@@ -17,7 +17,9 @@ export default function Reveals() {
     mm.add("(prefers-reduced-motion: no-preference)", () => {
       gsap.utils.toArray("[data-reveal]").forEach((el) => {
         const k = el.dataset.reveal;
-        gsap.fromTo(el, { clipPath: FROM[k] }, { clipPath: TO[k], duration: 1.6, ease: "expo.inOut", scrollTrigger: { trigger: el, start: "top 82%" } });
+        // "top 97%": elements at the very end of the page (the footer wordmark) can never scroll up to a
+        // higher line, so start the reveal as soon as they are on screen
+        gsap.fromTo(el, { clipPath: FROM[k] }, { clipPath: TO[k], duration: 1.6, ease: "expo.inOut", scrollTrigger: { trigger: el, start: "top 97%" } });
       });
     });
     // Pinned sections change page height after fonts/media settle.

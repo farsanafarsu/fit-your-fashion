@@ -1,5 +1,6 @@
-// Editorial placeholder still-life: a ghost-mannequin silhouette of the garment, lit like a studio shot.
-// Replace with real product photography (front + second angle) — see PlaceholderTag.
+// Product image. With a catalogue photo it shows the look on a model (angle 1 = a detail crop of it);
+// otherwise it falls back to a ghost-mannequin silhouette of the garment, lit like a studio shot.
+import Image from "next/image";
 import { useId } from "react";
 
 export const SHAPES = {
@@ -14,8 +15,25 @@ export const SHAPES = {
   necklace: "M90 120 Q150 230 210 120",
 };
 
-export default function GarmentArt({ product, angle = 0, className = "", bg = "light", tag = true }) {
+export default function GarmentArt({ product, angle = 0, className = "", bg = "light", tag = true, sizes = "(max-width: 768px) 70vw, 28vw" }) {
   const uid = useId().replace(/:/g, "");
+  if (product.photo) {
+    const { src, focus } = product.photo;
+    return (
+      // callers that pin it with `absolute inset-0` must not also get `relative`, or the box collapses
+      <div className={`overflow-hidden bg-mist ${/\babsolute\b/.test(className) ? "" : "relative"} ${className}`}>
+        <Image
+          src={src}
+          alt={`${product.name} in ${product.colourName}${angle ? ", detail" : ""}`}
+          fill
+          sizes={sizes}
+          className="object-cover"
+          style={{ objectPosition: focus, transformOrigin: focus, transform: angle ? "scale(1.45)" : undefined }}
+        />
+        {tag && <span className="label-sm absolute bottom-3 left-3 rounded-full bg-white/70 px-2 py-1 text-[10px] text-plum/60 backdrop-blur">Stock placeholder{angle ? " · detail" : ""}</span>}
+      </div>
+    );
+  }
   const d = SHAPES[product.type];
   const backdrop = bg === "dark" ? ["#2A1F44", "#1E1530"] : angle ? ["#F3EEF9", "#E2D6F1"] : ["#FFFFFF", "#ECE4F6"];
   const isLine = product.type === "necklace";

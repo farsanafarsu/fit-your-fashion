@@ -150,7 +150,7 @@ function Search() {
 }
 
 export default function Overlays() {
-  const { panel, setPanel } = useApp();
+  const { panel, setPanel, ask } = useApp();
   const lenis = useLenis();
   useEffect(() => {
     if (panel) lenis?.stop();
@@ -162,7 +162,7 @@ export default function Overlays() {
     <AnimatePresence>
       {panel && (
         <Sheet key={panel} title={titles[panel]} onClose={close} ai={panel === "stylist"}>
-          {panel === "stylist" && <StylistChat className="flex-1" />}
+          {panel === "stylist" && <StylistChat className="flex-1" initial={ask} />}
           {panel === "bag" && <Bag />}
           {panel === "wishlist" && <Wishlist />}
           {panel === "search" && <Search />}

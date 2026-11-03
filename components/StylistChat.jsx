@@ -36,8 +36,8 @@ function Outfit({ outfit, dark }) {
 }
 
 // Chat + voice stylist. `preview` plays the brief's example once in view (homepage Chapter 03).
-export default function StylistChat({ dark = false, preview = false, className = "" }) {
-  const { topMood } = useApp();
+export default function StylistChat({ dark = false, preview = false, initial = null, className = "" }) {
+  const { topMood, clearAsk } = useApp();
   const [msgs, setMsgs] = useState([{ from: "ai", text: "I’m your stylist. Tell me where you’re going, when, and what you love — I’ll dress you from the collection." }]);
   const [input, setInput] = useState("");
   const [thinking, setThinking] = useState(false);
@@ -61,6 +61,16 @@ export default function StylistChat({ dark = false, preview = false, className =
   useEffect(() => {
     list.current?.scrollTo({ top: list.current.scrollHeight, behavior: "smooth" });
   }, [msgs, thinking]);
+
+  // A question asked from elsewhere (e.g. the hero prompt) is sent once, then cleared.
+  const asked = useRef(null); // guards the strict-mode effect re-run from sending twice
+  useEffect(() => {
+    if (!initial || asked.current === initial) return;
+    asked.current = initial;
+    send(initial);
+    clearAsk();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initial]);
 
   // Homepage preview: type the example request when the chapter comes into view.
   useEffect(() => {

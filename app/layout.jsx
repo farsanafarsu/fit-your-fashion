@@ -1,4 +1,4 @@
-import { Bodoni_Moda, Jost } from "next/font/google";
+import { Cormorant_Garamond, Manrope, Mrs_Saint_Delafield } from "next/font/google";
 import "./globals.css";
 import { AppProvider } from "@/lib/store";
 import SmoothScroll from "@/components/SmoothScroll";
@@ -7,8 +7,11 @@ import Header from "@/components/Header";
 import Overlays from "@/components/overlays/Overlays";
 import Sound from "@/components/Sound";
 
-const bodoni = Bodoni_Moda({ subsets: ["latin"], style: ["normal", "italic"], variable: "--font-bodoni", display: "swap" });
-const jost = Jost({ subsets: ["latin"], variable: "--font-jost", display: "swap" });
+// Couture serif for display type, a quiet geometric sans for everything you read or tap.
+const serif = Cormorant_Garamond({ subsets: ["latin"], weight: ["400", "500", "600"], style: ["normal", "italic"], variable: "--font-serif", display: "swap" });
+const sans = Manrope({ subsets: ["latin"], variable: "--font-body", display: "swap" });
+// Hand-signed script for the brand signature (preloader, footer).
+const script = Mrs_Saint_Delafield({ subsets: ["latin"], weight: "400", variable: "--font-script", display: "block" });
 
 export const metadata = {
   title: "FIT YOUR FASHION — Wear the future",
@@ -19,7 +22,7 @@ export const viewport = { themeColor: "#1E1530", width: "device-width", initialS
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en" className={`${bodoni.variable} ${jost.variable}`}>
+    <html lang="en" className={`${serif.variable} ${sans.variable} ${script.variable}`}>
       <body>
         <a href="#main" className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[200] focus:bg-white focus:px-4 focus:py-2">
           Skip to content

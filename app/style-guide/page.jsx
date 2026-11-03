@@ -12,13 +12,13 @@ const COLOURS = [
 ];
 
 const TYPE = [
-  ["Display XXL", "display text-[13vw] sm:text-[72px] lg:text-[96px]", "Bodoni Moda 400 · 9–17vw · tracking −0.035em · leading 0.86–0.9", "Wear the future."],
-  ["Display L", "display text-[10vw] sm:text-[56px]", "Bodoni Moda 400 · 5.5–7vw section titles", "The Lavender Hour"],
-  ["Display italic", "display-i text-[8.5vw] sm:text-[40px]", "Bodoni Moda italic — the emotional half of a headline", "Before it’s yours."],
-  ["Product name", "display text-[26px]", "Bodoni Moda 400 · 22–26px · −0.02em", "Aurora Bias Gown"],
-  ["Body", "text-[16px] leading-relaxed", "Jost 400 · 14–16px · 1.6", "Silks that move like breath; tailoring with a pulse."],
-  ["Label", "label", "Jost 500 · 11px · +0.28em · uppercase", "Chapter 01 — The Collection"],
-  ["Label small", "label-sm", "Jost 400 · 10px · +0.24em · uppercase", "Photo placeholder"],
+  ["Display XXL", "display text-[13vw] sm:text-[72px] lg:text-[96px]", "Cormorant Garamond 500 · 9–17vw · tracking −0.02em · leading 0.86–0.92", "Wear the future."],
+  ["Display L", "display text-[10vw] sm:text-[56px]", "Cormorant Garamond 500 · 5.5–7vw section titles", "The Lavender Hour"],
+  ["Display italic", "display-i text-[8.5vw] sm:text-[40px]", "Cormorant Garamond italic — the emotional half of a headline", "Before it’s yours."],
+  ["Product name", "display text-[26px]", "Cormorant Garamond 500 · 22–26px · −0.02em", "Aurora Bias Gown"],
+  ["Body", "text-[16px] leading-relaxed", "Manrope 400 · 14–16px · 1.6", "Silks that move like breath; tailoring with a pulse."],
+  ["Label", "label", "Manrope 600 · 11px · +0.24em · uppercase", "Chapter 01 — The Collection"],
+  ["Label small", "label-sm", "Manrope 500 · 10px · +0.2em · uppercase", "Photo placeholder"],
 ];
 
 const MOTION = [

@@ -13,6 +13,11 @@ import Moods from "./sections/Moods";
 import ShopTheFilm from "./sections/ShopTheFilm";
 import PickedForYou from "./sections/PickedForYou";
 import Craft from "./sections/Craft";
+import ShopEdit from "./sections/ShopEdit";
+import ShopByCategory from "./sections/ShopByCategory";
+import FitFinder from "./sections/FitFinder";
+import CompleteTheLook from "./sections/CompleteTheLook";
+import Services from "./sections/Services";
 import { UGCWall, Newsletter, Footer } from "./sections/Closing";
 
 export default function Home() {
@@ -24,15 +29,20 @@ export default function Home() {
       <main id="main">
         <Hero ready={ready} />
         <Ticker />
+        <ShopByCategory />
         <Collection />
+        <ShopEdit />
         <DressingChapter />
+        <FitFinder />
         <StylistChapter />
+        <CompleteTheLook />
         <Atelier />
         <Moods />
         <ShopTheFilm />
         <PickedForYou />
         <Craft />
         <UGCWall />
+        <Services />
         <Newsletter />
       </main>
       <Footer />
