@@ -1,63 +1,137 @@
 "use client";
-import Image from "next/image";
 import { useEffect, useRef } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useApp } from "@/lib/store";
 import { Spark } from "../ui/primitives";
 
-// One couture piece floats centre stage in an arched frame, drifting with the pointer. Scroll pins the
-// hero and the piece comes apart into the layers it was made from — measurements, the AI-drafted
-// pattern, bias-cut silk, the finished gown — while the steps light up beside it. PLACEHOLDER imagery:
-// Unsplash stock until the campaign shoot (see public/products/CREDITS.md).
+// A muse, sketched in an arched frame, with her look laid out around her like a flat lay — the gown,
+// a cropped jacket, the ornaments, heels and a clutch. Scroll pins the hero and dresses her piece by
+// piece: each one flies off the flat lay and settles onto her, and its step lights up beside her.
 const STEPS = [
-  { n: "01", title: "Your measurements", line: "Twelve points from a two-minute scan." },
-  { n: "02", title: "Pattern, drafted by AI", line: "Graded to your body, not a size chart." },
-  { n: "03", title: "Silk, cut on the bias", line: "So it moves the way you do." },
-  { n: "04", title: "Finished in your size", line: "Hand-finished in the atelier." },
+  { n: "01", title: "The gown", line: "Lavender silk, cut on the bias to your measurements." },
+  { n: "02", title: "The jacket", line: "A cropped tuxedo, worn on the shoulders." },
+  { n: "03", title: "The ornaments", line: "Pearls, drop earrings and a crystal comb." },
+  { n: "04", title: "The finish", line: "Satin heels and a mirror clutch." },
 ];
-const SCROLL_LENGTH = 1.6; // viewport heights of scrolling while the piece unfolds
+const SCROLL_LENGTH = 2; // viewport heights of scrolling while she is dressed
 const ARCH = "rounded-t-[999px] rounded-b-[28px]";
 
-// Bottom layer: a dress form on a measuring grid.
-function Measurements() {
-  const lines = [[108, "Bust 86"], [150, "Waist 68"], [196, "Hip 94"]];
+// Where each piece waits on the flat lay, in the arch's 200×300 drawing units (centre of the piece),
+// and when it lands as a fraction of the pinned scroll. Labels sit under each group on the flat lay.
+const PIECES = [
+  { k: "gown", step: 0, at: [-78, 40], rotation: -10, scale: 0.5, land: 0.1 },
+  { k: "jacket", step: 1, at: [252, 18], rotation: 12, scale: 0.6, land: 0.3 },
+  { k: "comb", step: 2, at: [222, 92], rotation: -18, scale: 2, land: 0.47 },
+  { k: "necklace", step: 2, at: [252, 102], rotation: 8, scale: 2, land: 0.5 },
+  { k: "earrings", step: 2, at: [282, 92], rotation: 0, scale: 2.4, land: 0.53 },
+  { k: "bracelet", step: 2, at: [268, 128], rotation: 20, scale: 2.4, land: 0.56 },
+  { k: "clutch", step: 3, at: [232, 186], rotation: -14, scale: 2, land: 0.66 },
+  { k: "heels", step: 3, at: [272, 196], rotation: -22, scale: 1.5, land: 0.7 },
+];
+const LABELS = [
+  { text: "THE GOWN", at: [-78, 106] },
+  { text: "THE JACKET", at: [252, 56] },
+  { text: "THE ORNAMENTS", at: [254, 150] },
+  { text: "THE FINISH", at: [252, 216] },
+];
+
+const SKIN = "#f6eee9";
+const GOLD = "#e2c27d";
+const INK = { stroke: "var(--color-plum)", strokeWidth: 0.8, strokeLinejoin: "round", strokeLinecap: "round" };
+// pearls strung along the neckline curve
+const PEARLS = Array.from({ length: 11 }, (_, n) => {
+  const t = n / 10, u = 1 - t;
+  return [u * u * 92 + 2 * u * t * 100 + t * t * 108, u * u * 59 + 2 * u * t * 73 + t * t * 59];
+});
+
+// The muse: a fashion croquis, hand on hip, faceless, hair in a sleek bun.
+function Muse() {
   return (
     <svg viewBox="0 0 200 300" className="absolute inset-0 h-full w-full" aria-hidden>
-      <defs>
-        <pattern id="h-grid" width="16" height="16" patternUnits="userSpaceOnUse">
-          <path d="M16 0H0V16" fill="none" stroke="var(--color-lavender)" strokeOpacity=".14" strokeWidth=".6" />
-        </pattern>
-      </defs>
-      <rect width="200" height="300" fill="url(#h-grid)" />
-      <path d="M88 50Q100 44 112 50L114 64Q140 70 146 84L140 112Q132 130 124 150Q140 175 146 200L140 270H60L54 200Q60 175 76 150Q68 130 60 112L54 84Q60 70 86 64Z" fill="var(--color-lavender)" fillOpacity=".08" stroke="var(--color-lavender)" strokeWidth="1" />
-      {lines.map(([y, t]) => (
-        <g key={t}>
-          <path d={`M30 ${y}H170`} stroke="var(--color-pearl)" strokeWidth=".8" strokeDasharray="3 3" />
-          <circle cx="30" cy={y} r="2" fill="var(--color-pearl)" />
-          <circle cx="170" cy={y} r="2" fill="var(--color-pearl)" />
-          <text x="172" y={y - 5} textAnchor="end" fill="var(--color-pearl)" fontSize="8" letterSpacing="1">{t.toUpperCase()}</text>
-        </g>
-      ))}
+      <ellipse cx="100" cy="290" rx="34" ry="4" fill="var(--color-plum)" opacity=".35" />
+      <path
+        d="M96 44L95 55Q86 58 79 62Q75 65 75 72L72 104L74 142Q74 150 77 151Q79 150 79 143L79 106L82 78Q85 92 89 103Q88 116 85 132Q84 170 89 206L92 272L87 284H97L97 272L99 206L100 168L101 206L104 272L103 284H113L109 272L111 206Q116 170 115 132Q113 118 111 104Q112 92 118 78L128 97L116 116Q112 120 113 124L117 125L137 103L125 66Q121 59 105 55L104 44Z"
+        fill={SKIN} {...INK}
+      />
+      <ellipse cx="100" cy="33" rx="9.5" ry="12" fill={SKIN} {...INK} />
+      <path d="M90.5 36Q88 21 100 20.5Q112 21 109.5 36Q109 27 100 26Q91 27 90.5 36Z" fill="var(--color-plum)" />
+      <circle cx="100" cy="14.5" r="6.5" fill="var(--color-plum)" />
+      {/* collarbones and a hint of the knee, sketch-light */}
+      <path d="M90 60Q95 62 99 61M101 61Q105 62 110 60M91 206q2 2 6 1M103 207q4 1 6-1" fill="none" {...INK} strokeWidth=".5" opacity=".6" />
     </svg>
   );
 }
 
-// Second layer: the pattern pieces, with seam allowances, notches and a grainline.
-function Pattern() {
-  const pieces = ["M60 44L90 40Q100 52 110 40L140 44L146 74L136 110H64L54 74Z", "M64 122H136L160 278H40Z"];
+// Her look, one group per piece, drawn in place on the figure (GSAP moves them out to the flat lay).
+function Look() {
   return (
-    <svg viewBox="0 0 200 300" className="absolute inset-0 h-full w-full" aria-hidden>
-      {pieces.map((d) => (
-        <g key={d}>
-          <path d={d} fill="var(--color-lavender)" fillOpacity=".06" stroke="var(--color-lavender)" strokeWidth="1.2" strokeLinejoin="round" />
-          <path d={d} fill="none" stroke="var(--color-lavender)" strokeOpacity=".5" strokeWidth=".7" strokeDasharray="2 3" transform="translate(100 160) scale(.92) translate(-100 -160)" />
-        </g>
+    <svg viewBox="0 0 200 300" className="absolute inset-0 h-full w-full overflow-visible" aria-hidden>
+      <defs>
+        <linearGradient id="h-silk" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stopColor="#6e4fa8" />
+          <stop offset=".35" stopColor="#c9b6e4" />
+          <stop offset=".55" stopColor="#9b7fd0" />
+          <stop offset=".72" stopColor="#e9dff5" />
+          <stop offset="1" stopColor="#7d5fb8" />
+        </linearGradient>
+        <linearGradient id="h-mirror" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stopColor="#ffffff" />
+          <stop offset=".5" stopColor="#c9b6e4" />
+          <stop offset="1" stopColor="#f4eefb" />
+        </linearGradient>
+      </defs>
+
+      <g className="h-piece" data-k="gown">
+        <path d="M91 77L93 58M109 77L107 58" stroke="#8d6fc4" strokeWidth="1.2" />
+        <path d="M86 78Q93 73 100 80Q107 73 114 78Q114 92 111 103Q110 116 116 132Q118 165 114 200Q118 240 136 284Q100 292 64 284Q82 240 86 200Q82 165 84 132Q90 116 89 103Q86 92 86 78Z" fill="url(#h-silk)" {...INK} strokeWidth=".6" />
+        <path d="M100 132Q102 200 100 288M92 200Q88 240 80 284M108 205Q112 245 122 286" fill="none" stroke="var(--color-plum)" strokeWidth=".5" opacity=".25" />
+        <path d="M104 84Q108 140 106 200Q110 240 124 282" fill="none" stroke="#fff" strokeWidth="1.6" opacity=".35" />
+        {/* the slit, showing her leg */}
+        <path d="M95 176Q90 230 83 283L95 285Q96 232 97 178Z" fill={SKIN} {...INK} strokeWidth=".6" />
+      </g>
+
+      <g className="h-piece" data-k="jacket">
+        <path d="M95 55Q82 57 73 62Q67 66 66 76L62 134Q71 138 81 133L84 104L90 122L97 88Z" fill="var(--color-plum-2)" stroke="var(--color-lavender)" strokeWidth=".6" strokeLinejoin="round" />
+        <path d="M105 55Q118 57 127 62Q133 66 134 76L138 134Q129 138 119 133L116 104L110 122L103 88Z" fill="var(--color-plum-2)" stroke="var(--color-lavender)" strokeWidth=".6" strokeLinejoin="round" />
+        <path d="M95 55L97 88L90 66L93 60ZM105 55L103 88L110 66L107 60Z" fill="var(--color-lavender)" opacity=".9" />
+        <path d="M70 82L67 128M130 82L133 128M70 118h9M121 118h9" fill="none" stroke="var(--color-lavender)" strokeWidth=".5" opacity=".45" />
+      </g>
+
+      <g className="h-piece" data-k="comb">
+        <path d="M93 12Q100 6 107 12" fill="none" stroke={GOLD} strokeWidth="1" />
+        {[93.5, 96.5, 100, 103.5, 106.5].map((x, n) => <circle key={x} cx={x} cy={n === 2 ? 7.5 : n % 2 ? 9 : 11.2} r="1" fill="#fff" stroke={GOLD} strokeWidth=".4" />)}
+      </g>
+      <g className="h-piece" data-k="necklace">
+        {PEARLS.map(([x, y]) => <circle key={x} cx={x} cy={y} r="1.25" fill="#fff" stroke="#d9cfe6" strokeWidth=".3" />)}
+        <path d="M100 73v2" stroke={GOLD} strokeWidth=".5" />
+        <path d="M100 75l2 2.6-2 2.6-2-2.6Z" fill="#6e4fa8" stroke={GOLD} strokeWidth=".5" />
+      </g>
+      <g className="h-piece" data-k="earrings">
+        <path d="M90.4 36.5v3.5M109.6 36.5v3.5" stroke={GOLD} strokeWidth=".5" />
+        <circle cx="90.4" cy="41.6" r="1.6" fill="#fff" stroke={GOLD} strokeWidth=".4" />
+        <circle cx="109.6" cy="41.6" r="1.6" fill="#fff" stroke={GOLD} strokeWidth=".4" />
+      </g>
+      <g className="h-piece" data-k="bracelet">
+        <ellipse cx="76.5" cy="137" rx="3.4" ry="1.3" fill="none" stroke={GOLD} strokeWidth="1.1" />
+      </g>
+      <g className="h-piece" data-k="clutch">
+        <rect x="70" y="145.5" width="14" height="9" rx="2" fill="url(#h-mirror)" stroke={GOLD} strokeWidth=".5" />
+        <path d="M70.5 149h13M77 147.5v3" stroke={GOLD} strokeWidth=".4" />
+      </g>
+      <g className="h-piece" data-k="heels">
+        <path d="M85.5 286Q91 280 98 284.5L98 287Q91 287.5 85.5 287.5ZM102.5 284.5Q109 280 114.5 286L114.5 287.5Q109 287.5 102.5 287Z" fill="#6e4fa8" stroke={GOLD} strokeWidth=".4" />
+        <path d="M97 287L97.5 293M103 287L102.5 293" stroke="#6e4fa8" strokeWidth=".9" />
+      </g>
+
+      {LABELS.map((l) => (
+        <text key={l.text} className="h-label" x={l.at[0]} y={l.at[1]} textAnchor="middle" fill="var(--color-lavender)" fontSize="6" letterSpacing="1.6">{l.text}</text>
       ))}
-      <path d="M64 92h6M130 92h6M52 200h6M142 200h6" stroke="var(--color-pearl)" strokeWidth="1" />
-      <path d="M100 150V256M96 156l4-6 4 6M96 250l4 6 4-6" fill="none" stroke="var(--color-pearl)" strokeWidth=".8" />
-      <text x="100" y="80" textAnchor="middle" fill="var(--color-pearl)" fontSize="7" letterSpacing="1.4">FRONT BODICE ×1</text>
-      <text x="100" y="212" textAnchor="middle" fill="var(--color-pearl)" fontSize="7" letterSpacing="1.4" transform="rotate(-90 100 212) translate(0 -8)">GRAIN</text>
+
+      {/* sparkle when the look is complete */}
+      {[[58, 60, 1], [146, 40, 0.7], [150, 170, 0.9], [48, 210, 0.6], [124, 250, 0.5]].map(([x, y, s]) => (
+        <path key={x} className="h-sparkle" d={`M${x} ${y - 7 * s}Q${x + 1} ${y - 1} ${x + 7 * s} ${y}Q${x + 1} ${y + 1} ${x} ${y + 7 * s}Q${x - 1} ${y + 1} ${x - 7 * s} ${y}Q${x - 1} ${y - 1} ${x} ${y - 7 * s}Z`} fill="#fff" opacity="0" />
+      ))}
     </svg>
   );
 }
@@ -66,15 +140,12 @@ export default function Hero({ ready }) {
   const root = useRef(null);
   const { askStylist } = useApp();
 
-  // Pin and unfold on scroll. Created on mount (before later pinned sections) so their start
+  // Pin and dress her on scroll. Created on mount (before later pinned sections) so their start
   // positions account for this pin's spacer.
   useEffect(() => {
     const ctx = gsap.context(() => {
       const mm = gsap.matchMedia();
       mm.add("(prefers-reduced-motion: no-preference)", () => {
-        const w = () => root.current.querySelector(".h-stack").offsetWidth;
-        // spread of the layers perpendicular to the tilted plane, bottom layer first
-        const spread = [-0.72, -0.24, 0.24, 0.72];
         const tl = gsap.timeline({
           defaults: { ease: "none" },
           scrollTrigger: {
@@ -87,25 +158,39 @@ export default function Hero({ ready }) {
             invalidateOnRefresh: true,
           },
         });
-        tl.to(".h-copy", { opacity: 0, y: -30, duration: 0.25 }, 0)
-          .to(".h-cue", { opacity: 0, duration: 0.1 }, 0)
-          .to(".h-stack", { rotateX: 56, rotateZ: -26, scale: 0.74, duration: 0.4, ease: "power2.inOut" }, 0)
-          .to(".h-shadow", { scaleX: 1.5, opacity: 0.35, duration: 0.4 }, 0)
+        tl.to(".h-copy", { opacity: 0, y: -30, duration: 0.12 }, 0)
+          .to(".h-cue", { opacity: 0, duration: 0.06 }, 0)
           .to(".h-word", { xPercent: -14, duration: 1 }, 0)
-          .to(".h-ring", { opacity: 0, scale: 0.6, duration: 0.2 }, 0)
-          .fromTo(".h-inside", { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.25 }, 0.2);
-        root.current.querySelectorAll(".h-layer").forEach((el, k) => {
-          tl.to(el, { z: () => w() * spread[k], duration: 0.45, ease: "power2.out" }, 0.25);
+          .fromTo(".h-inside", { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.14 }, 0.1)
+          .to(".h-label", { opacity: 0, duration: 0.08, stagger: 0.18 }, 0.06);
+
+        const pieces = gsap.utils.toArray(".h-piece", root.current);
+        PIECES.forEach((p) => {
+          const el = pieces.find((n) => n.dataset.k === p.k);
+          const b = el.getBBox();
+          tl.fromTo(
+            el,
+            { x: p.at[0] - (b.x + b.width / 2), y: p.at[1] - (b.y + b.height / 2), rotation: p.rotation, scale: p.scale, transformOrigin: "50% 50%" },
+            { x: 0, y: 0, rotation: 0, scale: 1, duration: 0.16, ease: "power3.inOut" },
+            p.land
+          );
         });
-        tl.fromTo(".h-step", { opacity: 0, x: 16 }, { opacity: 1, x: 0, duration: 0.15, stagger: 0.12 }, 0.32)
-          .to({}, { duration: 0.12 }); // hold the open stack before the page moves on
+        // each landing flashes the arch, and lights its step
+        [0.26, 0.44, 0.67, 0.84].forEach((t, k) => {
+          tl.fromTo(".h-flash", { opacity: 0 }, { opacity: 0.3, duration: 0.03, yoyo: true, repeat: 1, immediateRender: false }, t - 0.02);
+          tl.fromTo(`.h-step:nth-child(${k + 1})`, { opacity: 0.25 }, { opacity: 1, duration: 0.05 }, t - 0.03);
+        });
+        tl.fromTo(".h-steps", { opacity: 0, x: 16 }, { opacity: 1, x: 0, duration: 0.1 }, 0.12)
+          .fromTo(".h-sparkle", { opacity: 0, scale: 0, transformOrigin: "50% 50%" }, { opacity: 1, scale: 1, duration: 0.06, stagger: 0.015, ease: "back.out(3)" }, 0.88)
+          .to(".h-sparkle", { opacity: 0.5, duration: 0.04 }, 0.97)
+          .to({}, { duration: 0.05 }); // hold the finished look before the page moves on
       });
     }, root);
     return () => ctx.revert();
   }, []);
 
-  // Arrival after the intro curtain: the piece rises into place, the headline lifts through its line
-  // masks, the rest follows. Then the piece leans toward the pointer.
+  // Arrival after the intro curtain: the arch rises into place, the headline lifts through its line
+  // masks, the rest follows. Then the arch leans toward the pointer.
   useEffect(() => {
     if (!ready) return;
     const ctx = gsap.context(() => {
@@ -113,6 +198,7 @@ export default function Hero({ ready }) {
       mm.add({ reduce: "(prefers-reduced-motion: reduce)", ok: "(prefers-reduced-motion: no-preference)" }, ({ conditions }) => {
         if (conditions.reduce) {
           gsap.set(".h-in, .h-fade, .h-line", { opacity: 1, y: 0, yPercent: 0 });
+          gsap.set(".h-label", { opacity: 0 });
           return;
         }
         gsap.timeline()
@@ -128,8 +214,8 @@ export default function Hero({ ready }) {
           const gy = gsap.quickTo(".h-glow", "y", { duration: 1.6, ease: "power3" });
           const move = (e) => {
             const nx = e.clientX / innerWidth - 0.5, ny = e.clientY / innerHeight - 0.5;
-            ry(nx * 16);
-            rx(-ny * 10);
+            ry(nx * 12);
+            rx(-ny * 8);
             gx(nx * 60);
             gy(ny * 40);
           };
@@ -141,7 +227,6 @@ export default function Hero({ ready }) {
     return () => ctx.revert();
   }, [ready]);
 
-  const layer = `h-layer absolute inset-0 overflow-hidden ${ARCH} shadow-[0_30px_70px_-25px_rgba(0,0,0,.8)]`;
   return (
     <div>
       {/* own wrapper: GSAP inserts its pin-spacer here, outside React's sibling list */}
@@ -158,44 +243,37 @@ export default function Hero({ ready }) {
           Couture · Couture
         </p>
 
-        {/* ── The piece ───────────────────────────────────── */}
+        {/* ── The muse ────────────────────────────────────── */}
         <div className="h-in absolute left-1/2 top-[58%] -translate-x-1/2 -translate-y-1/2 opacity-0 [perspective:1600px] md:top-[56%]">
           <div className="h-tilt [transform-style:preserve-3d]">
-            <div className="motion-safe:animate-[float-y_6s_ease-in-out_infinite] [transform-style:preserve-3d]">
-              <div className={`h-stack relative aspect-[2/3] w-[min(52vw,34svh)] [transform-style:preserve-3d] md:w-[clamp(220px,min(24vw,42svh),380px)]`}>
-                <div className={`${layer} border border-lavender/25 bg-plum-2`}><Measurements /></div>
-                <div className={`${layer} border border-lavender/30 bg-[#2f2350]/80`}><Pattern /></div>
-                <div className={layer} style={{ background: "repeating-linear-gradient(45deg,rgba(255,255,255,.07) 0 2px,transparent 2px 9px),linear-gradient(135deg,#6e4fa8,#c9b6e4 38%,#8d6fc4 52%,#e9dff5 68%,#6e4fa8)" }}>
-                  <span className="label-sm absolute bottom-[14%] left-1/2 -translate-x-1/2 rotate-[-45deg] text-[9px] text-plum/70">Bias grain 45°</span>
+            <div className="motion-safe:animate-[float-y_6s_ease-in-out_infinite]">
+              <div className="relative aspect-[2/3] w-[min(52vw,34svh)] md:w-[clamp(220px,min(24vw,42svh),380px)]" role="img" aria-label="Illustration of a woman being dressed in a lavender silk gown, cropped jacket, pearls, heels and a clutch">
+                {/* the studio: a lit backdrop inside the arch */}
+                <div className={`absolute inset-0 overflow-hidden ${ARCH} border border-lavender/25 bg-[radial-gradient(ellipse_at_50%_38%,#3d2d63,#2a1f44_55%,#1b1330)] shadow-[0_40px_90px_-30px_rgba(0,0,0,.85)]`}>
+                  <div className="absolute inset-x-[18%] top-0 h-[70%] bg-[radial-gradient(ellipse_at_50%_0%,rgba(233,223,245,.35),transparent_70%)]" />
+                  <Muse />
+                  <div className="h-flash absolute inset-0 bg-[radial-gradient(circle_at_50%_45%,#fff,transparent_70%)] opacity-0" />
                 </div>
-                <div className={layer}>
-                  <Image src="/products/aurora-gown.webp" alt="Model in a shimmering violet gown with a high slit" fill priority sizes="(max-width: 768px) 52vw, 380px" className="object-cover" style={{ objectPosition: "50% 0%" }} />
-                  <div className="absolute inset-0 bg-gradient-to-t from-plum/50 via-transparent to-transparent" />
-                </div>
+                <Look />
               </div>
             </div>
           </div>
           {/* floor shadow */}
-          <div className="h-shadow absolute -bottom-12 left-1/2 h-8 w-[80%] -translate-x-1/2 rounded-[50%] bg-black/70 opacity-60 blur-xl" aria-hidden />
-          {/* spinning badge on the arch's shoulder */}
-          <svg viewBox="0 0 120 120" className="h-ring absolute -right-12 -top-6 h-24 w-24 text-lavender motion-safe:animate-[spin_18s_linear_infinite] md:-right-16 md:h-28 md:w-28" aria-hidden>
-            <defs><path id="h-ring" d="M60 60m-46 0a46 46 0 1 1 92 0a46 46 0 1 1-92 0" /></defs>
-            <text fill="currentColor" fontSize="10" letterSpacing="2.6"><textPath href="#h-ring">AI FITTED · MADE TO MEASURE ·</textPath></text>
-          </svg>
+          <div className="absolute -bottom-12 left-1/2 h-8 w-[80%] -translate-x-1/2 rounded-[50%] bg-black/70 opacity-60 blur-xl" aria-hidden />
         </div>
 
         {/* ── Opening copy ────────────────────────────────── */}
-        <div className="h-copy absolute inset-x-0 top-[112px] z-20 px-[var(--gutter)] md:bottom-14 md:top-auto md:w-[min(44vw,560px)]">
+        <div className="h-copy absolute inset-x-0 top-[112px] z-20 px-[var(--gutter)] md:bottom-14 md:top-auto md:w-[min(40vw,520px)]">
           <p className="h-fade label-sm flex items-center gap-2 text-lavender opacity-0"><Spark className="h-3 w-3" animate={false} /> Season 01 · The Lavender Hour</p>
           <h1 className="mt-4 md:mt-5">
             {["Couture,", "cut for you."].map((t, k) => (
-              <span key={t} className={`block overflow-hidden text-[13vw] leading-[0.9] md:text-[min(6.4vw,12svh)] ${k ? "display-i pb-[0.1em] text-lavender" : "display"}`}>
+              <span key={t} className={`block overflow-hidden text-[13vw] leading-[0.9] md:text-[min(6vw,11svh)] ${k ? "display-i pb-[0.1em] text-lavender" : "display"}`}>
                 <span className="h-line inline-block opacity-0">{t}</span>
               </span>
             ))}
           </h1>
-          <p className="h-fade mt-4 hidden max-w-[36ch] text-[14.5px] leading-relaxed text-pearl/70 opacity-0 md:block">
-            Every piece is drafted by AI from your measurements, then hand-finished in silk. Scroll to see one come together.
+          <p className="h-fade mt-4 hidden max-w-[34ch] text-[14.5px] leading-relaxed text-pearl/70 opacity-0 md:block">
+            Every piece is drafted by AI from your measurements, then styled into a complete look. Scroll to dress her.
           </p>
           <div className="h-fade mt-6 hidden items-center gap-6 opacity-0 md:flex">
             <a href="#shop" className="group flex items-center gap-4" data-cursor="Shop">
@@ -210,7 +288,7 @@ export default function Hero({ ready }) {
           </div>
         </div>
 
-        {/* phone actions sit under the piece */}
+        {/* phone actions sit under the muse */}
         <div className="h-copy absolute inset-x-0 bottom-0 z-20 flex gap-2 px-[var(--gutter)] pb-[max(1.25rem,env(safe-area-inset-bottom))] md:hidden">
           <a href="#shop" className="h-fade label flex-1 rounded-full bg-pearl py-4 text-center text-plum opacity-0">Shop now</a>
           <button onClick={() => askStylist("Dinner date in London in January")} className="h-fade label ai-glow flex flex-1 items-center justify-center gap-2 rounded-full bg-white/10 py-4 opacity-0 backdrop-blur-md">
@@ -219,19 +297,18 @@ export default function Hero({ ready }) {
         </div>
 
         <div className="h-cue h-fade absolute bottom-10 right-[var(--gutter)] z-20 hidden items-center gap-3 opacity-0 md:flex" aria-hidden>
-          <span className="label-sm text-pearl/60">Scroll to unfold</span>
+          <span className="label-sm text-pearl/60">Scroll to dress her</span>
           <span className="relative h-10 w-px overflow-hidden bg-white/15"><span className="absolute inset-x-0 top-0 h-1/2 bg-lavender motion-safe:animate-[float-y_1.6s_ease-in-out_infinite]" /></span>
         </div>
-        <p className="h-fade label-sm absolute bottom-3 left-1/2 z-20 hidden -translate-x-1/2 text-[9px] text-pearl/35 opacity-0 md:block">Placeholder imagery · Unsplash</p>
 
-        {/* ── Inside the piece (revealed by scroll) ───────── */}
+        {/* ── Styling (revealed by scroll) ────────────────── */}
         <div className="h-inside pointer-events-none absolute inset-x-0 top-[112px] z-20 px-[var(--gutter)] opacity-0 md:bottom-14 md:top-auto md:w-[min(34vw,460px)]" aria-hidden>
-          <p className="label-sm text-lavender">Inside every piece</p>
-          <p className="display mt-3 text-[10vw] leading-[0.92] md:text-[min(4.6vw,9svh)]">Made layer<br /><span className="display-i text-lavender">by layer.</span></p>
+          <p className="label-sm text-lavender">The fitting</p>
+          <p className="display mt-3 text-[10vw] leading-[0.92] md:text-[min(4.6vw,9svh)]">Styled, layer<br /><span className="display-i text-lavender">by layer.</span></p>
         </div>
-        <ol className="pointer-events-none absolute inset-x-0 bottom-6 z-20 grid grid-cols-2 gap-x-4 gap-y-3 px-[var(--gutter)] md:inset-x-auto md:bottom-auto md:right-[var(--gutter)] md:top-1/2 md:w-[min(26vw,320px)] md:-translate-y-1/2 md:flex md:flex-col-reverse md:gap-7" aria-label="How each piece is made">
+        <ol className="h-steps pointer-events-none absolute inset-x-0 bottom-6 z-20 grid grid-cols-2 gap-x-4 gap-y-3 px-[var(--gutter)] opacity-0 md:inset-x-auto md:bottom-auto md:right-[var(--gutter)] md:top-1/2 md:w-[min(24vw,300px)] md:-translate-y-1/2 md:grid-cols-1 md:gap-7" aria-label="The look">
           {STEPS.map((s) => (
-            <li key={s.n} className="h-step border-t border-white/15 pt-3 opacity-0">
+            <li key={s.n} className="h-step border-t border-white/15 pt-3">
               <p className="label-sm text-lavender">{s.n}</p>
               <p className="display mt-1 text-[17px] leading-tight md:text-[24px]">{s.title}</p>
               <p className="mt-1 hidden text-[13px] text-pearl/60 md:block">{s.line}</p>
