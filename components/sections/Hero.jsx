@@ -1,228 +1,137 @@
 "use client";
 import Image from "next/image";
-import Link from "next/link";
-import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { byId, formatPrice } from "@/lib/catalog";
-import { predictSize } from "@/lib/sizing";
 import { useApp } from "@/lib/store";
-import { useLenis } from "../SmoothScroll";
 import { Spark } from "../ui/primitives";
 
-// Full-bleed editorial split: each look is a diptych of two campaign frames edge to edge, a slow
-// camera push on both, curtain wipes between looks and one quiet line of controls. Garments that
-// are in the catalogue carry a hotspot with the visitor's predicted size. Scroll drives the looks
-// while the hero is pinned. PLACEHOLDER imagery: Unsplash stock until the campaign shoot
-// (see public/products/CREDITS.md and public/editorial/CREDITS.md).
-const LOOKS = [
-  {
-    id: "moonlit", name: "Moonlit Evening", line: "Shimmer cut on the bias, for the hour after dusk.",
-    title: ["Wear the future.", "Before it’s yours."],
-    ask: "Dinner date in London in January",
-    frames: [
-      { src: "/products/aurora-gown.webp", pos: "50% 0%", product: "aurora-gown", spot: [50, 40], alt: "Model in a shimmering violet gown with a high slit" },
-      { src: "/editorial/silver-gown.webp", pos: "50% 6%", alt: "Model in a silver evening gown in a dim restaurant" },
-    ],
-  },
-  {
-    id: "soft-power", name: "Soft Power", line: "Wide trousers, sharp shoulders, nothing to prove.",
-    title: ["Power, softly.", "Tailored to you."],
-    ask: "A pitch meeting, I want to look powerful",
-    frames: [
-      { src: "/products/vesper-trouser.webp", pos: "50% 0%", product: "vesper-trouser", spot: [50, 47], alt: "Model in a white shirt and black wide-leg trousers" },
-      { src: "/products/nocturne-blazer.webp", pos: "50% 18%", product: "nocturne-blazer", spot: [56, 57], alt: "Model in an oversized black blazer and sunglasses" },
-    ],
-  },
-  {
-    id: "bridal", name: "Bridal Lavender", line: "Silk drape and heirloom colour for the ceremony.",
-    title: ["Heirlooms, reborn.", "For your forever."],
-    ask: "I have a wedding in Kochi in December, I love lavender",
-    frames: [
-      { src: "/products/mist-drape.webp", pos: "50% 4%", product: "mist-drape", spot: [60, 44], alt: "Model in a magenta and black silk saree" },
-      { src: "/products/halo-cape.webp", pos: "50% 22%", product: "halo-cape", spot: [38, 40], alt: "Bride holding a long sheer veil in a forest" },
-    ],
-  },
-  {
-    id: "off-duty", name: "Off-Duty Muse", line: "A liquid slip and soft knit, worn like a secret.",
-    title: ["Ease, worn well.", "Like a secret."],
-    ask: "Something off-duty for a weekend in Bangalore",
-    frames: [
-      { src: "/products/lune-slip.webp", pos: "50% 40%", product: "lune-slip", spot: [52, 44], alt: "Model in a black satin slip dress against stone" },
-      { src: "/products/cloud-knit.webp", pos: "50% 22%", alt: "Model in a grey knit sweater among dark trees" },
-    ],
-  },
+// One couture piece floats centre stage in an arched frame, drifting with the pointer. Scroll pins the
+// hero and the piece comes apart into the layers it was made from — measurements, the AI-drafted
+// pattern, bias-cut silk, the finished gown — while the steps light up beside it. PLACEHOLDER imagery:
+// Unsplash stock until the campaign shoot (see public/products/CREDITS.md).
+const STEPS = [
+  { n: "01", title: "Your measurements", line: "Twelve points from a two-minute scan." },
+  { n: "02", title: "Pattern, drafted by AI", line: "Graded to your body, not a size chart." },
+  { n: "03", title: "Silk, cut on the bias", line: "So it moves the way you do." },
+  { n: "04", title: "Finished in your size", line: "Hand-finished in the atelier." },
 ];
-const AUTOPLAY_MS = 7000;
-const SCROLL_PER_LOOK = 0.55; // viewport heights of scrolling spent on each look while the hero is pinned
-const ease = [0.22, 1, 0.36, 1];
-const curtain = [0.76, 0, 0.24, 1];
-const pad = (n) => String(n).padStart(2, "0");
+const SCROLL_LENGTH = 1.6; // viewport heights of scrolling while the piece unfolds
+const ARCH = "rounded-t-[999px] rounded-b-[28px]";
 
-// The shoppable point on a garment: pulses until opened, then shows the piece in the visitor's size.
-function Hotspot({ id, spot: [x, y] }) {
-  const { body, returnHistory, addToBag, bag } = useApp();
-  const [open, setOpen] = useState(false);
-  const p = byId(id);
-  const fit = predictSize(p, body, returnHistory);
-  const inBag = bag.some((b) => b.id === p.id);
+// Bottom layer: a dress form on a measuring grid.
+function Measurements() {
+  const lines = [[108, "Bust 86"], [150, "Waist 68"], [196, "Hip 94"]];
   return (
-    <div className="absolute z-20 hidden sm:block" style={{ left: `${x}%`, top: `${y}%` }} onPointerEnter={(e) => e.pointerType === "mouse" && setOpen(true)} onPointerLeave={() => setOpen(false)}>
-      <button onClick={() => setOpen((o) => !o)} aria-expanded={open} aria-label={`Shop ${p.name}`} className="relative -ml-5 -mt-5 grid h-10 w-10 place-items-center" data-cursor="Shop">
-        <span className="absolute inset-1 rounded-full border border-white/70 motion-safe:animate-ping" aria-hidden />
-        <span className="relative h-3 w-3 rounded-full bg-white shadow-[0_0_0_6px_rgba(255,255,255,.18)]" />
-      </button>
-      <AnimatePresence>
-        {open && (
-          <motion.div
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 6 }}
-            transition={{ duration: 0.35, ease }}
-            className={`absolute top-1/2 w-[232px] -translate-y-1/2 rounded-2xl bg-pearl/95 p-3.5 text-plum shadow-[0_24px_60px_-20px_rgba(0,0,0,.6)] backdrop-blur-xl ${x > 55 ? "right-6" : "left-6"}`}
-          >
-            <p className="label-sm text-amethyst">In this look</p>
-            <p className="display mt-1 text-[21px] leading-tight">{p.name}</p>
-            <p className="mt-1 text-[12px] text-ink-soft">{p.fabric} · {formatPrice()}</p>
-            <p className="label-sm mt-2.5 flex items-center gap-1.5 text-amethyst"><Spark className="h-3 w-3" animate={false} /> Your size {fit.size} · {Math.round(fit.confidence * 100)}%</p>
-            <div className="mt-3 flex gap-2">
-              <button onClick={() => addToBag(p.id, fit.size)} className="label-sm flex-1 rounded-full bg-plum py-2.5 text-pearl hover:bg-amethyst">{inBag ? "In bag ✓" : "Add"}</button>
-              <Link href={`/dressing-room?look=${p.id}`} className="label-sm flex-1 rounded-full border border-plum/20 py-2.5 text-center hover:border-plum">Try on</Link>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </div>
+    <svg viewBox="0 0 200 300" className="absolute inset-0 h-full w-full" aria-hidden>
+      <defs>
+        <pattern id="h-grid" width="16" height="16" patternUnits="userSpaceOnUse">
+          <path d="M16 0H0V16" fill="none" stroke="var(--color-lavender)" strokeOpacity=".14" strokeWidth=".6" />
+        </pattern>
+      </defs>
+      <rect width="200" height="300" fill="url(#h-grid)" />
+      <path d="M88 50Q100 44 112 50L114 64Q140 70 146 84L140 112Q132 130 124 150Q140 175 146 200L140 270H60L54 200Q60 175 76 150Q68 130 60 112L54 84Q60 70 86 64Z" fill="var(--color-lavender)" fillOpacity=".08" stroke="var(--color-lavender)" strokeWidth="1" />
+      {lines.map(([y, t]) => (
+        <g key={t}>
+          <path d={`M30 ${y}H170`} stroke="var(--color-pearl)" strokeWidth=".8" strokeDasharray="3 3" />
+          <circle cx="30" cy={y} r="2" fill="var(--color-pearl)" />
+          <circle cx="170" cy={y} r="2" fill="var(--color-pearl)" />
+          <text x="172" y={y - 5} textAnchor="end" fill="var(--color-pearl)" fontSize="8" letterSpacing="1">{t.toUpperCase()}</text>
+        </g>
+      ))}
+    </svg>
   );
 }
 
-// One half of the diptych. New looks wipe up over the old one; the photo settles from a push-in.
-function Frame({ f, dir, delay, priority, className }) {
+// Second layer: the pattern pieces, with seam allowances, notches and a grainline.
+function Pattern() {
+  const pieces = ["M60 44L90 40Q100 52 110 40L140 44L146 74L136 110H64L54 74Z", "M64 122H136L160 278H40Z"];
   return (
-    <motion.div
-      className={`absolute inset-0 overflow-hidden ${className}`}
-      initial={{ clipPath: dir > 0 ? "inset(100% 0% 0% 0%)" : "inset(0% 0% 100% 0%)" }}
-      animate={{ clipPath: "inset(0% 0% 0% 0%)", transition: { duration: 1.25, ease: curtain, delay } }}
-      exit={{ opacity: 1, transition: { duration: 1.3 + delay } }}
-    >
-      <motion.div className="absolute inset-0" initial={{ scale: 1.2 }} animate={{ scale: 1.04, transition: { duration: 7, ease: [0.16, 1, 0.3, 1], delay } }}>
-        <Image src={f.src} alt={f.alt} fill priority={priority} sizes="(max-width: 768px) 100vw, 50vw" className="object-cover" style={{ objectPosition: f.pos }} />
-      </motion.div>
-      {f.product && <Hotspot id={f.product} spot={f.spot} />}
-    </motion.div>
+    <svg viewBox="0 0 200 300" className="absolute inset-0 h-full w-full" aria-hidden>
+      {pieces.map((d) => (
+        <g key={d}>
+          <path d={d} fill="var(--color-lavender)" fillOpacity=".06" stroke="var(--color-lavender)" strokeWidth="1.2" strokeLinejoin="round" />
+          <path d={d} fill="none" stroke="var(--color-lavender)" strokeOpacity=".5" strokeWidth=".7" strokeDasharray="2 3" transform="translate(100 160) scale(.92) translate(-100 -160)" />
+        </g>
+      ))}
+      <path d="M64 92h6M130 92h6M52 200h6M142 200h6" stroke="var(--color-pearl)" strokeWidth="1" />
+      <path d="M100 150V256M96 156l4-6 4 6M96 250l4 6 4-6" fill="none" stroke="var(--color-pearl)" strokeWidth=".8" />
+      <text x="100" y="80" textAnchor="middle" fill="var(--color-pearl)" fontSize="7" letterSpacing="1.4">FRONT BODICE ×1</text>
+      <text x="100" y="212" textAnchor="middle" fill="var(--color-pearl)" fontSize="7" letterSpacing="1.4" transform="rotate(-90 100 212) translate(0 -8)">GRAIN</text>
+    </svg>
   );
 }
 
 export default function Hero({ ready }) {
   const root = useRef(null);
-  const [i, setI] = useState(0);
-  const [dir, setDir] = useState(1);
-  const [playing, setPlaying] = useState(true);
-  const [hover, setHover] = useState(false);
-  const [pinned, setPinned] = useState(false); // scroll drives the looks (motion allowed)
-  const [progress, setProgress] = useState(0); // progress within the current look's scroll stretch
-  const touch = useRef(null);
-  const pin = useRef(null);
-  const idx = useRef(0);
-  const lenis = useLenis();
   const { askStylist } = useApp();
-  const reduce = useReducedMotion();
-  const look = LOOKS[i];
 
-  const show = useCallback((n) => {
-    if (n === idx.current) return;
-    setDir(n > idx.current ? 1 : -1);
-    idx.current = n;
-    setI(n);
-  }, []);
-
-  // While pinned, controls scroll to the look's stretch so the page and the carousel never disagree.
-  const goTo = useCallback(
-    (n) => {
-      const st = pin.current;
-      if (!st) return show((n + LOOKS.length) % LOOKS.length);
-      const clamped = Math.max(0, Math.min(LOOKS.length, n)); // n === length → continue past the hero
-      // land just inside the look's stretch (the very top for the first look, past the pin for "next" on the last)
-      const at = clamped > 0 && clamped < LOOKS.length ? clamped + 0.12 : clamped;
-      const y = st.start + ((st.end - st.start) * at) / LOOKS.length;
-      if (lenis) lenis.scrollTo(y, { duration: 1.2 });
-      else window.scrollTo({ top: y, behavior: "smooth" });
-    },
-    [lenis, show]
-  );
-  const go = useCallback((d) => goTo(idx.current + d), [goTo]);
-
-  // Pin the hero and map scroll to looks. Created on mount (before later pinned sections) so their
-  // start positions account for this pin's spacer.
+  // Pin and unfold on scroll. Created on mount (before later pinned sections) so their start
+  // positions account for this pin's spacer.
   useEffect(() => {
-    const mm = gsap.matchMedia();
-    mm.add("(prefers-reduced-motion: no-preference)", () => {
-      const st = ScrollTrigger.create({
-        trigger: root.current,
-        start: "top top",
-        end: () => "+=" + window.innerHeight * SCROLL_PER_LOOK * LOOKS.length,
-        pin: true,
-        pinSpacing: true,
-        anticipatePin: 1,
-        invalidateOnRefresh: true,
-        onUpdate: (self) => {
-          const raw = self.progress * LOOKS.length;
-          show(Math.min(LOOKS.length - 1, Math.floor(raw)));
-          setProgress(Math.min(1, raw - Math.min(LOOKS.length - 1, Math.floor(raw))));
-        },
+    const ctx = gsap.context(() => {
+      const mm = gsap.matchMedia();
+      mm.add("(prefers-reduced-motion: no-preference)", () => {
+        const w = () => root.current.querySelector(".h-stack").offsetWidth;
+        // spread of the layers perpendicular to the tilted plane, bottom layer first
+        const spread = [-0.72, -0.24, 0.24, 0.72];
+        const tl = gsap.timeline({
+          defaults: { ease: "none" },
+          scrollTrigger: {
+            trigger: root.current,
+            start: "top top",
+            end: () => "+=" + window.innerHeight * SCROLL_LENGTH,
+            pin: true,
+            scrub: 0.6,
+            anticipatePin: 1,
+            invalidateOnRefresh: true,
+          },
+        });
+        tl.to(".h-copy", { opacity: 0, y: -30, duration: 0.25 }, 0)
+          .to(".h-cue", { opacity: 0, duration: 0.1 }, 0)
+          .to(".h-stack", { rotateX: 56, rotateZ: -26, scale: 0.74, duration: 0.4, ease: "power2.inOut" }, 0)
+          .to(".h-shadow", { scaleX: 1.5, opacity: 0.35, duration: 0.4 }, 0)
+          .to(".h-word", { xPercent: -14, duration: 1 }, 0)
+          .to(".h-ring", { opacity: 0, scale: 0.6, duration: 0.2 }, 0)
+          .fromTo(".h-inside", { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.25 }, 0.2);
+        root.current.querySelectorAll(".h-layer").forEach((el, k) => {
+          tl.to(el, { z: () => w() * spread[k], duration: 0.45, ease: "power2.out" }, 0.25);
+        });
+        tl.fromTo(".h-step", { opacity: 0, x: 16 }, { opacity: 1, x: 0, duration: 0.15, stagger: 0.12 }, 0.32)
+          .to({}, { duration: 0.12 }); // hold the open stack before the page moves on
       });
-      pin.current = st;
-      setPinned(true);
-      return () => {
-        pin.current = null;
-        setPinned(false);
-        st.kill();
-      };
-    });
-    return () => mm.revert();
-  }, [show]);
-
-  // Autoplay only when scroll isn't driving the looks (reduced motion turns both off).
-  useEffect(() => {
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) setPlaying(false);
+    }, root);
+    return () => ctx.revert();
   }, []);
-  useEffect(() => {
-    if (pinned || !ready || !playing || hover) return;
-    const t = setTimeout(() => go(1), AUTOPLAY_MS);
-    return () => clearTimeout(t);
-  }, [i, ready, playing, hover, go, pinned]);
 
-  const onKey = (e) => {
-    if (e.key === "ArrowRight") go(1);
-    if (e.key === "ArrowLeft") go(-1);
-  };
-
-  // Arrival after the intro curtain: the two frames rise, the headline lifts in, the controls follow.
-  // Then a slight pointer drift between the halves and the type.
+  // Arrival after the intro curtain: the piece rises into place, the headline lifts through its line
+  // masks, the rest follows. Then the piece leans toward the pointer.
   useEffect(() => {
     if (!ready) return;
     const ctx = gsap.context(() => {
       const mm = gsap.matchMedia();
       mm.add({ reduce: "(prefers-reduced-motion: reduce)", ok: "(prefers-reduced-motion: no-preference)" }, ({ conditions }) => {
         if (conditions.reduce) {
-          gsap.set(".h-fade, .h-arrive", { opacity: 1, y: 0, clipPath: "none" });
+          gsap.set(".h-in, .h-fade, .h-line", { opacity: 1, y: 0, yPercent: 0 });
           return;
         }
-        // (the headline itself rises with framer once `ready`, so it can also swap per look)
         gsap.timeline()
-          .fromTo(".h-arrive", { clipPath: "inset(100% 0% 0% 0%)" }, { clipPath: "inset(0% 0% 0% 0%)", duration: 1.1, ease: "expo.inOut", stagger: 0.08 }, 0)
-          .fromTo(".h-fade", { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.8, ease: "expo.out", stagger: 0.05 }, 0.5);
+          .fromTo(".h-in", { opacity: 0, y: 90, rotateX: 24 }, { opacity: 1, y: 0, rotateX: 0, duration: 1.3, ease: "expo.out" }, 0)
+          .fromTo(".h-word", { opacity: 0 }, { opacity: 1, duration: 1.4, ease: "power2.out" }, 0)
+          .fromTo(".h-line", { yPercent: 110 }, { yPercent: 0, opacity: 1, duration: 1, ease: "expo.out", stagger: 0.08 }, 0.15)
+          .fromTo(".h-fade", { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.8, ease: "expo.out", stagger: 0.06 }, 0.45);
 
         if (window.matchMedia("(pointer: fine)").matches) {
-          const layers = [[".h-left", 10], [".h-right", -10], [".h-type", -14]].map(([s, k]) => ({
-            k,
-            x: gsap.quickTo(s, "x", { duration: 1.4, ease: "power3" }),
-            y: gsap.quickTo(s, "y", { duration: 1.4, ease: "power3" }),
-          }));
+          const rx = gsap.quickTo(".h-tilt", "rotateX", { duration: 1.2, ease: "power3" });
+          const ry = gsap.quickTo(".h-tilt", "rotateY", { duration: 1.2, ease: "power3" });
+          const gx = gsap.quickTo(".h-glow", "x", { duration: 1.6, ease: "power3" });
+          const gy = gsap.quickTo(".h-glow", "y", { duration: 1.6, ease: "power3" });
           const move = (e) => {
             const nx = e.clientX / innerWidth - 0.5, ny = e.clientY / innerHeight - 0.5;
-            layers.forEach((l) => { l.x(nx * l.k); l.y(ny * l.k * 0.5); });
+            ry(nx * 16);
+            rx(-ny * 10);
+            gx(nx * 60);
+            gy(ny * 40);
           };
           root.current.addEventListener("pointermove", move);
           return () => root.current?.removeEventListener("pointermove", move);
@@ -232,146 +141,103 @@ export default function Hero({ ready }) {
     return () => ctx.revert();
   }, [ready]);
 
+  const layer = `h-layer absolute inset-0 overflow-hidden ${ARCH} shadow-[0_30px_70px_-25px_rgba(0,0,0,.8)]`;
   return (
     <div>
       {/* own wrapper: GSAP inserts its pin-spacer here, outside React's sibling list */}
-      <section
-        ref={root}
-        data-hero
-        className="on-dark relative h-[100svh] min-h-[620px] overflow-hidden bg-plum text-pearl"
-        aria-roledescription="carousel"
-        aria-label="Season 01 looks"
-        onKeyDown={onKey}
-        onPointerEnter={(e) => e.pointerType === "mouse" && setHover(true)}
-        onPointerLeave={() => setHover(false)}
-        onTouchStart={(e) => (touch.current = e.touches[0].clientX)}
-        onTouchEnd={(e) => {
-          if (touch.current == null) return;
-          const dx = e.changedTouches[0].clientX - touch.current;
-          if (Math.abs(dx) > 50) go(dx < 0 ? 1 : -1);
-          touch.current = null;
-        }}
-      >
-        {/* ── Diptych ─────────────────────────────────────── */}
-        {/* starts below the floating header so the nav never sits over a face */}
-        <div className="absolute inset-x-0 bottom-0 top-[97px] grid md:grid-cols-2 md:gap-px" aria-live="polite">
-          {[0, 1].map((side) => (
-            <div key={side} className={`h-arrive relative overflow-hidden bg-plum-2 ${side ? "hidden md:block" : ""}`}>
-              {/* oversized so the pointer drift never shows an edge */}
-              <div className={`${side ? "h-right" : "h-left"} absolute -inset-4`}>
-                <AnimatePresence initial={false}>
-                  <Frame key={look.id} f={look.frames[side]} dir={dir} delay={side * 0.12} priority={i === 0} />
-                </AnimatePresence>
-              </div>
-            </div>
-          ))}
-        </div>
-        {/* hidden preload of the next look so wipes never reveal a blank frame */}
-        <div className="hidden" aria-hidden>
-          {LOOKS[(i + 1) % LOOKS.length].frames.map((f) => <Image key={f.src} src={f.src} alt="" width={900} height={1350} sizes="50vw" loading="eager" />)}
-        </div>
-
-        {/* light: header scrim, cinematic floor fade, vignette, grain */}
+      <section ref={root} data-hero className="on-dark relative h-[100svh] min-h-[640px] overflow-hidden bg-plum text-pearl" aria-label="Season 01">
+        {/* light: a lavender bloom that follows the pointer, a floor fade, grain */}
         <div className="pointer-events-none absolute inset-0" aria-hidden>
-          <div className="absolute inset-x-0 top-[97px] h-32 bg-gradient-to-b from-[#120c1f]/60 to-transparent" />
-          <div className="absolute inset-x-0 bottom-0 h-[62%] bg-gradient-to-t from-[#120c1f] via-[#120c1f]/60 to-transparent md:h-[58%]" />
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_55%,rgba(18,12,31,.45)_100%)]" />
+          <div className="h-glow absolute left-1/2 top-[56%] h-[80vmin] w-[80vmin] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(circle,rgba(201,182,228,.32),rgba(110,79,168,.12)_45%,transparent_70%)]" />
+          <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-[#120c1f] to-transparent" />
         </div>
         <div className="grain pointer-events-none absolute inset-0 opacity-30" aria-hidden />
 
-        {/* season line under the header (left only: the right half's face can sit near the top) */}
-        <div className="h-fade absolute left-[var(--gutter)] top-[117px] z-20 opacity-0">
-          <p className="label-sm flex items-center gap-2 text-pearl/80"><Spark className="h-3 w-3" animate={false} /> Season 01 · The Lavender Hour</p>
-        </div>
-        <p className="h-fade label-sm absolute bottom-3 right-[var(--gutter)] z-20 hidden text-[9px] text-pearl/35 opacity-0 md:block">Placeholder imagery · Unsplash</p>
+        {/* the word behind everything, outlined, sliding with scroll */}
+        <p className="h-word display pointer-events-none absolute left-0 top-[56%] -translate-y-1/2 whitespace-nowrap pl-[4vw] text-[30vw] leading-none text-transparent opacity-0 [-webkit-text-stroke:1px_rgba(201,182,228,.28)] md:text-[24vw]" aria-hidden>
+          Couture · Couture
+        </p>
 
-        {/* ── Type + controls ─────────────────────────────── */}
-        <div className="absolute inset-x-0 bottom-0 z-20 px-[var(--gutter)] pb-[max(1.25rem,env(safe-area-inset-bottom))] md:pb-10">
-          {/* each look has its own headline: the old one lifts out through its line masks, the new one rises in */}
-          <h1 className="h-type" aria-label={look.title.join(" ")}>
-            <AnimatePresence mode="wait">
-              <motion.span key={look.id} className="block" initial="hidden" animate={ready ? "shown" : "hidden"} exit="gone" aria-hidden>
-                {look.title.map((text, k) => (
-                  <span
-                    key={k}
-                    className={`block overflow-hidden text-[12vw] leading-[0.86] sm:text-[11vw] lg:text-[min(9.4vw,17svh)] ${k ? "display-i pb-[0.12em] text-lavender sm:pl-[1.2em]" : "display pb-[0.05em]"}`}
-                  >
-                    <motion.span
-                      className="inline-block whitespace-nowrap"
-                      variants={{
-                        hidden: { yPercent: reduce ? 0 : 115, opacity: reduce ? 0 : 1 },
-                        shown: { yPercent: 0, opacity: 1, transition: { duration: reduce ? 0.3 : 1.1, ease, delay: reduce ? 0 : 0.1 + k * 0.09 } },
-                        gone: { yPercent: reduce ? 0 : -110, opacity: reduce ? 0 : 1, transition: { duration: reduce ? 0.2 : 0.5, ease: curtain, delay: k * 0.05 } },
-                      }}
-                    >
-                      {text}
-                    </motion.span>
-                  </span>
-                ))}
-              </motion.span>
-            </AnimatePresence>
-          </h1>
-
-          <div className="mt-5 flex flex-col gap-5 border-t border-white/15 pt-5 md:mt-7 md:flex-row md:items-end md:justify-between md:gap-10 md:pt-6">
-            {/* current look + actions */}
-            <div className="h-fade flex flex-col gap-4 opacity-0 sm:flex-row sm:items-center sm:gap-8">
-              <div className="min-w-0 sm:w-[300px]">
-                <AnimatePresence mode="wait" initial={false}>
-                  <motion.div key={look.id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0, transition: { duration: 0.6, ease, delay: 0.35 } }} exit={{ opacity: 0, y: -8, transition: { duration: 0.25 } }}>
-                    <p className="label-sm text-lavender">Look {pad(i + 1)} · {look.name}</p>
-                    <p className="mt-1.5 text-[13.5px] leading-snug text-pearl/70">{look.line}</p>
-                  </motion.div>
-                </AnimatePresence>
-              </div>
-              <div className="flex gap-2">
-                <a href="#shop" className="label flex-1 rounded-full bg-pearl px-7 py-4 text-center text-plum transition-colors hover:bg-lavender sm:flex-none" data-cursor="Shop">Shop now</a>
-                <button onClick={() => askStylist(look.ask)} className="label ai-glow flex flex-1 items-center justify-center gap-2 rounded-full bg-white/10 px-6 py-4 backdrop-blur-md transition-colors hover:bg-white/20 sm:flex-none" data-cursor="Ask">
-                  <Spark className="h-3.5 w-3.5" /> Style me
-                </button>
-              </div>
-            </div>
-
-            {/* look index */}
-            <div className="h-fade flex items-center gap-4 opacity-0 md:gap-6">
-              <div className="flex min-w-0 flex-1 gap-3 md:w-[clamp(320px,36vw,560px)] md:flex-none" role="tablist" aria-label="Choose a look">
-                {LOOKS.map((l, n) => (
-                  <button key={l.id} role="tab" aria-selected={n === i} aria-label={l.name} onClick={() => goTo(n)} className="group min-w-0 flex-1 text-left">
-                    <span className="relative block h-[2px] overflow-hidden rounded-full bg-white/20">
-                      {pinned ? (
-                        // scroll-driven: bars fill as you scroll through each look
-                        <span className="absolute inset-y-0 left-0 bg-pearl" style={{ width: n < i ? "100%" : n === i ? `${Math.max(6, progress * 100)}%` : "0%" }} />
-                      ) : (
-                        n === i && (
-                          <span
-                            key={`${i}-${playing && !hover}`}
-                            className="absolute inset-y-0 left-0 bg-pearl"
-                            style={{ width: playing && !hover ? undefined : "100%", animation: playing && !hover ? `hero-progress ${AUTOPLAY_MS}ms linear forwards` : "none" }}
-                          />
-                        )
-                      )}
-                    </span>
-                    <span className={`label-sm mt-2.5 hidden truncate text-[10px] transition-colors md:block ${n === i ? "text-pearl" : "text-pearl/40 group-hover:text-pearl/75"}`}>
-                      {pad(n + 1)} {l.name}
-                    </span>
-                  </button>
-                ))}
-              </div>
-              <div className="flex shrink-0 gap-2">
-                {!pinned && (
-                  <button onClick={() => setPlaying(!playing)} aria-label={playing ? "Pause slideshow" : "Play slideshow"} className="grid h-11 w-11 place-items-center rounded-full text-[10px] text-pearl/70 hover:bg-white/10">
-                    {playing ? "❚❚" : "▶"}
-                  </button>
-                )}
-                <button onClick={() => go(-1)} aria-label="Previous look" className="grid h-11 w-11 place-items-center rounded-full border border-white/25 transition hover:bg-pearl hover:text-plum" data-cursor="Prev">
-                  <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden><path d="M15 5l-7 7 7 7" /></svg>
-                </button>
-                <button onClick={() => go(1)} aria-label="Next look" className="grid h-11 w-11 place-items-center rounded-full border border-white/25 transition hover:bg-pearl hover:text-plum" data-cursor="Next">
-                  <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden><path d="M9 5l7 7-7 7" /></svg>
-                </button>
+        {/* ── The piece ───────────────────────────────────── */}
+        <div className="h-in absolute left-1/2 top-[58%] -translate-x-1/2 -translate-y-1/2 opacity-0 [perspective:1600px] md:top-[56%]">
+          <div className="h-tilt [transform-style:preserve-3d]">
+            <div className="motion-safe:animate-[float-y_6s_ease-in-out_infinite] [transform-style:preserve-3d]">
+              <div className={`h-stack relative aspect-[2/3] w-[min(52vw,34svh)] [transform-style:preserve-3d] md:w-[clamp(220px,min(24vw,42svh),380px)]`}>
+                <div className={`${layer} border border-lavender/25 bg-plum-2`}><Measurements /></div>
+                <div className={`${layer} border border-lavender/30 bg-[#2f2350]/80`}><Pattern /></div>
+                <div className={layer} style={{ background: "repeating-linear-gradient(45deg,rgba(255,255,255,.07) 0 2px,transparent 2px 9px),linear-gradient(135deg,#6e4fa8,#c9b6e4 38%,#8d6fc4 52%,#e9dff5 68%,#6e4fa8)" }}>
+                  <span className="label-sm absolute bottom-[14%] left-1/2 -translate-x-1/2 rotate-[-45deg] text-[9px] text-plum/70">Bias grain 45°</span>
+                </div>
+                <div className={layer}>
+                  <Image src="/products/aurora-gown.webp" alt="Model in a shimmering violet gown with a high slit" fill priority sizes="(max-width: 768px) 52vw, 380px" className="object-cover" style={{ objectPosition: "50% 0%" }} />
+                  <div className="absolute inset-0 bg-gradient-to-t from-plum/50 via-transparent to-transparent" />
+                </div>
               </div>
             </div>
           </div>
+          {/* floor shadow */}
+          <div className="h-shadow absolute -bottom-12 left-1/2 h-8 w-[80%] -translate-x-1/2 rounded-[50%] bg-black/70 opacity-60 blur-xl" aria-hidden />
+          {/* spinning badge on the arch's shoulder */}
+          <svg viewBox="0 0 120 120" className="h-ring absolute -right-12 -top-6 h-24 w-24 text-lavender motion-safe:animate-[spin_18s_linear_infinite] md:-right-16 md:h-28 md:w-28" aria-hidden>
+            <defs><path id="h-ring" d="M60 60m-46 0a46 46 0 1 1 92 0a46 46 0 1 1-92 0" /></defs>
+            <text fill="currentColor" fontSize="10" letterSpacing="2.6"><textPath href="#h-ring">AI FITTED · MADE TO MEASURE ·</textPath></text>
+          </svg>
         </div>
+
+        {/* ── Opening copy ────────────────────────────────── */}
+        <div className="h-copy absolute inset-x-0 top-[112px] z-20 px-[var(--gutter)] md:bottom-14 md:top-auto md:w-[min(44vw,560px)]">
+          <p className="h-fade label-sm flex items-center gap-2 text-lavender opacity-0"><Spark className="h-3 w-3" animate={false} /> Season 01 · The Lavender Hour</p>
+          <h1 className="mt-4 md:mt-5">
+            {["Couture,", "cut for you."].map((t, k) => (
+              <span key={t} className={`block overflow-hidden text-[13vw] leading-[0.9] md:text-[min(6.4vw,12svh)] ${k ? "display-i pb-[0.1em] text-lavender" : "display"}`}>
+                <span className="h-line inline-block opacity-0">{t}</span>
+              </span>
+            ))}
+          </h1>
+          <p className="h-fade mt-4 hidden max-w-[36ch] text-[14.5px] leading-relaxed text-pearl/70 opacity-0 md:block">
+            Every piece is drafted by AI from your measurements, then hand-finished in silk. Scroll to see one come together.
+          </p>
+          <div className="h-fade mt-6 hidden items-center gap-6 opacity-0 md:flex">
+            <a href="#shop" className="group flex items-center gap-4" data-cursor="Shop">
+              <span className="label">Explore collection</span>
+              <span className="grid h-14 w-14 place-items-center rounded-full bg-lavender text-plum transition-transform duration-500 group-hover:scale-110 group-hover:rotate-[-45deg]">
+                <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.6" aria-hidden><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+              </span>
+            </a>
+            <button onClick={() => askStylist("Dinner date in London in January")} className="label ai-glow flex items-center gap-2 rounded-full bg-white/10 px-6 py-4 backdrop-blur-md transition-colors hover:bg-white/20" data-cursor="Ask">
+              <Spark className="h-3.5 w-3.5" /> Style me
+            </button>
+          </div>
+        </div>
+
+        {/* phone actions sit under the piece */}
+        <div className="h-copy absolute inset-x-0 bottom-0 z-20 flex gap-2 px-[var(--gutter)] pb-[max(1.25rem,env(safe-area-inset-bottom))] md:hidden">
+          <a href="#shop" className="h-fade label flex-1 rounded-full bg-pearl py-4 text-center text-plum opacity-0">Shop now</a>
+          <button onClick={() => askStylist("Dinner date in London in January")} className="h-fade label ai-glow flex flex-1 items-center justify-center gap-2 rounded-full bg-white/10 py-4 opacity-0 backdrop-blur-md">
+            <Spark className="h-3.5 w-3.5" /> Style me
+          </button>
+        </div>
+
+        <div className="h-cue h-fade absolute bottom-10 right-[var(--gutter)] z-20 hidden items-center gap-3 opacity-0 md:flex" aria-hidden>
+          <span className="label-sm text-pearl/60">Scroll to unfold</span>
+          <span className="relative h-10 w-px overflow-hidden bg-white/15"><span className="absolute inset-x-0 top-0 h-1/2 bg-lavender motion-safe:animate-[float-y_1.6s_ease-in-out_infinite]" /></span>
+        </div>
+        <p className="h-fade label-sm absolute bottom-3 left-1/2 z-20 hidden -translate-x-1/2 text-[9px] text-pearl/35 opacity-0 md:block">Placeholder imagery · Unsplash</p>
+
+        {/* ── Inside the piece (revealed by scroll) ───────── */}
+        <div className="h-inside pointer-events-none absolute inset-x-0 top-[112px] z-20 px-[var(--gutter)] opacity-0 md:bottom-14 md:top-auto md:w-[min(34vw,460px)]" aria-hidden>
+          <p className="label-sm text-lavender">Inside every piece</p>
+          <p className="display mt-3 text-[10vw] leading-[0.92] md:text-[min(4.6vw,9svh)]">Made layer<br /><span className="display-i text-lavender">by layer.</span></p>
+        </div>
+        <ol className="pointer-events-none absolute inset-x-0 bottom-6 z-20 grid grid-cols-2 gap-x-4 gap-y-3 px-[var(--gutter)] md:inset-x-auto md:bottom-auto md:right-[var(--gutter)] md:top-1/2 md:w-[min(26vw,320px)] md:-translate-y-1/2 md:flex md:flex-col-reverse md:gap-7" aria-label="How each piece is made">
+          {STEPS.map((s) => (
+            <li key={s.n} className="h-step border-t border-white/15 pt-3 opacity-0">
+              <p className="label-sm text-lavender">{s.n}</p>
+              <p className="display mt-1 text-[17px] leading-tight md:text-[24px]">{s.title}</p>
+              <p className="mt-1 hidden text-[13px] text-pearl/60 md:block">{s.line}</p>
+            </li>
+          ))}
+        </ol>
       </section>
     </div>
   );
