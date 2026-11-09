@@ -20,11 +20,15 @@ export default function DressingChapter() {
   const { body, returnHistory } = useApp();
   const [look, setLook] = useState(0);
   const [heat, setHeat] = useState(false);
-  const [inView, setInView] = useState(false);
+  const [mounted, setMounted] = useState(false); // 3D scene created once the chapter is near
+  const [inView, setInView] = useState(false); // ...but it only renders while actually on screen
   const ref = useRef(null);
 
   useEffect(() => {
-    const io = new IntersectionObserver(([e]) => e.isIntersecting && setInView(true), { rootMargin: "300px" });
+    const io = new IntersectionObserver(([e]) => {
+      setInView(e.isIntersecting);
+      if (e.isIntersecting) setMounted(true);
+    }, { rootMargin: "300px" });
     io.observe(ref.current);
     return () => io.disconnect();
   }, []);
@@ -60,7 +64,7 @@ export default function DressingChapter() {
 
         <div className="relative">
           <div className="relative mx-auto aspect-[3/4] max-h-[85svh] overflow-hidden rounded-[24px] sm:aspect-[4/5] sm:rounded-[28px] bg-gradient-to-b from-plum-2 to-plum ring-1 ring-white/10">
-            {inView && <AvatarScene className="absolute inset-0" body={body} outfit={items} sizes={sizes} heatmap={heat} pose="walk" autoRotate dark />}
+            {mounted && <AvatarScene className="absolute inset-0" body={body} outfit={items} sizes={sizes} heatmap={heat} pose="walk" autoRotate dark active={inView} dpr={[1, 1.5]} />}
             <div className="absolute inset-x-4 top-4 flex flex-wrap items-center justify-between gap-2">
               <div className="flex gap-1.5 rounded-full bg-white/10 p-1 backdrop-blur-md" role="tablist" aria-label="Preview looks">
                 {LOOKS.map((l, i) => (

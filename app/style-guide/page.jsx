@@ -91,7 +91,7 @@ export default function StyleGuide() {
         <ul className="mt-6 space-y-2 text-[14px] text-ink-soft">
           <li>Opening: 2.6s — light leak (1.4s) → letters stagger 60ms → curtain lift (1.1s, expo.inOut). Shown once per session; Esc skips.</li>
           <li>Things arrive slowly and leave quickly. Nothing bounces except magnetic buttons.</li>
-          <li>Reduced motion: no smooth-scroll, no pins or parallax, no grain flicker; reveals become instant and pinned chapters stack.</li>
+          <li>Reduced motion: no smooth-scroll, no pins or parallax; reveals become instant and pinned chapters stack.</li>
         </ul>
 
         <h2 className="label mt-24 text-amethyst">05 · AI elements</h2>

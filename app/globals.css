@@ -76,20 +76,16 @@ input[type="range"] { height: 28px; }
 }
 
 /* ── Film surface ─────────────────────────────────────────────── */
-/* clip (not hidden): the oversized grain layer must never make its box scrollable. */
+/* Still film grain. It used to jitter (an oversized layer translated 6×/s), which re-rendered the noise
+   over every grained section on every step and was the second-largest cost while scrolling. */
 .grain { overflow: clip; }
 .grain::after {
-  content: ""; position: absolute; inset: -50%; pointer-events: none; z-index: 3; opacity: 0.09;
+  content: ""; position: absolute; inset: 0; pointer-events: none; z-index: 3; opacity: 0.09;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-  animation: grain 0.9s steps(6) infinite;
 }
 .vignette::before {
   content: ""; position: absolute; inset: 0; pointer-events: none; z-index: 2;
   background: radial-gradient(ellipse at center, transparent 45%, rgba(30, 21, 48, 0.55) 100%);
-}
-@keyframes grain {
-  0% { transform: translate(0, 0); } 20% { transform: translate(-4%, 3%); } 40% { transform: translate(3%, -5%); }
-  60% { transform: translate(-2%, 6%); } 80% { transform: translate(5%, 2%); } 100% { transform: translate(0, 0); }
 }
 
 /* Mood ambience: a fixed wash that the "Shop by mood" tiles retint. */
@@ -105,12 +101,15 @@ html[data-mood="bridal"] .ambience { background: radial-gradient(circle at 50% 4
 
 /* ── AI visual language ───────────────────────────────────────── */
 .ai-glow { position: relative; isolation: isolate; }
+/* The iridescent border drifts only on hover: animating background-position can't be composited, so a
+   page full of always-on glows repainted every frame while scrolling. */
 .ai-glow::before {
   content: ""; position: absolute; inset: -1px; border-radius: inherit; padding: 1px; z-index: -1;
-  background: var(--iris); background-size: 200% 200%; animation: iris 8s linear infinite;
+  background: var(--iris); background-size: 200% 200%;
   -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
   -webkit-mask-composite: xor; mask-composite: exclude;
 }
+.ai-glow:hover::before, .ai-glow:focus-visible::before { animation: iris 3s linear infinite; }
 .ai-glow:hover { box-shadow: 0 0 0 1px rgba(201, 182, 228, 0.4), 0 10px 40px -10px rgba(201, 182, 228, 0.9); }
 .ai-shimmer {
   background: linear-gradient(100deg, rgba(233, 223, 245, 0.35) 30%, rgba(255, 255, 255, 0.9) 50%, rgba(233, 223, 245, 0.35) 70%);
@@ -126,7 +125,8 @@ html[data-mood="bridal"] .ambience { background: radial-gradient(circle at 50% 4
 @keyframes iris { to { background-position: 200% 200%; } }
 @keyframes shimmer { from { background-position: 100% 0; } to { background-position: -200% 0; } }
 @keyframes spark { 0%, 100% { transform: scale(1) rotate(0); opacity: 1; } 50% { transform: scale(0.72) rotate(45deg); opacity: 0.7; } }
-.spark { animation: spark 2.4s var(--ease-film) infinite; transform-origin: center; }
+/* on the <svg> element itself (not a group inside it) so the pulse runs on the compositor */
+.spark { animation: spark 2.4s var(--ease-film) infinite; transform-origin: center; will-change: transform; }
 
 @keyframes haze { 0%, 100% { transform: translate3d(0, 0, 0) scale(1); } 50% { transform: translate3d(4%, -3%, 0) scale(1.08); } }
 @keyframes float-y { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }

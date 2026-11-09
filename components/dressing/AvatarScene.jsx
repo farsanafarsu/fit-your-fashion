@@ -222,10 +222,12 @@ function Avatar({ body, outfit, sizes, heatmap, pose }) {
   );
 }
 
-export default function AvatarScene({ body, outfit, sizes = {}, heatmap = false, pose = "stand", autoRotate = false, dark = false, className = "" }) {
+// `active={false}` stops the render loop entirely (e.g. the homepage preview once scrolled away);
+// `dpr` lets a small preview render at a lower pixel ratio than the full dressing room.
+export default function AvatarScene({ body, outfit, sizes = {}, heatmap = false, pose = "stand", autoRotate = false, dark = false, className = "", active = true, dpr = [1, 1.75] }) {
   return (
     <div className={className} data-cursor="Drag">
-      <Canvas shadows camera={{ position: [0, 1.0, 4.4], fov: 30 }} dpr={[1, 1.75]} gl={{ antialias: true, preserveDrawingBuffer: true }}>
+      <Canvas frameloop={active ? "always" : "never"} shadows camera={{ position: [0, 1.0, 4.4], fov: 30 }} dpr={dpr} gl={{ antialias: true, preserveDrawingBuffer: true }}>
         <ambientLight intensity={dark ? 0.5 : 0.75} />
         <hemisphereLight args={["#ffffff", "#C9B6E4", 0.6]} />
         <directionalLight position={[2.5, 4, 3]} intensity={1.7} castShadow shadow-mapSize={[1024, 1024]} />

@@ -5,7 +5,7 @@ import { gsap } from "gsap";
 // Animated four-point "spark" — the mark for every AI element.
 export function Spark({ className = "h-4 w-4", animate = true }) {
   return (
-    <svg viewBox="0 0 24 24" className={className} aria-hidden>
+    <svg viewBox="0 0 24 24" className={`${className} ${animate ? "spark" : ""}`} aria-hidden>
       <defs>
         <linearGradient id="spark-g" x1="0" y1="0" x2="1" y2="1">
           <stop offset="0" stopColor="#C9B6E4" />
@@ -13,9 +13,7 @@ export function Spark({ className = "h-4 w-4", animate = true }) {
           <stop offset="1" stopColor="#6E4FA8" />
         </linearGradient>
       </defs>
-      <g className={animate ? "spark" : ""}>
-        <path d="M12 1.5c.6 5.2 2.3 8.6 10.5 10.5-8.2 1.9-9.9 5.3-10.5 10.5-.6-5.2-2.3-8.6-10.5-10.5C9.7 10.1 11.4 6.7 12 1.5Z" fill="url(#spark-g)" />
-      </g>
+      <path d="M12 1.5c.6 5.2 2.3 8.6 10.5 10.5-8.2 1.9-9.9 5.3-10.5 10.5-.6-5.2-2.3-8.6-10.5-10.5C9.7 10.1 11.4 6.7 12 1.5Z" fill="url(#spark-g)" />
     </svg>
   );
 }

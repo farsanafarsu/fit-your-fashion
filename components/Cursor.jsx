@@ -49,7 +49,8 @@ export default function Cursor() {
     <div
       ref={ring}
       aria-hidden
-      className={`${on ? "" : "hidden"} pointer-events-none fixed left-0 top-0 z-[300] -ml-3 -mt-3 flex h-6 w-6 items-center justify-center rounded-full border border-lavender mix-blend-normal backdrop-blur-[1px] data-[dark=1]:border-mist ${label ? "bg-white/70" : ""}`}
+      // no backdrop-filter: on an element that moves every frame it re-blurs the page behind it each frame
+      className={`${on ? "" : "hidden"} pointer-events-none fixed left-0 top-0 z-[300] -ml-3 -mt-3 flex h-6 w-6 items-center justify-center rounded-full border border-lavender will-change-transform data-[dark=1]:border-mist ${label ? "bg-white/85" : ""}`}
       style={{ boxShadow: "0 0 18px rgba(201,182,228,.55)" }}
     >
       <span className="label-sm whitespace-nowrap text-[3px] tracking-[0.2em] text-amethyst" style={{ fontSize: 2.6 }}>

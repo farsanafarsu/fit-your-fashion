@@ -59,7 +59,9 @@ export default function Header() {
   const closeTimer = useRef(0);
 
   useEffect(() => {
-    const onScroll = () => {
+    let raf = 0;
+    const update = () => {
+      raf = 0;
       const y = window.scrollY;
       setHidden(y > 160 && y > last.current);
       setSolid(y > 40);
@@ -68,8 +70,13 @@ export default function Header() {
       setPastHero(!hero || hero.getBoundingClientRect().bottom < window.innerHeight * 0.3);
       last.current = y;
     };
+    // at most once per frame: scroll events can fire several times a frame, and each read forces layout
+    const onScroll = () => { if (!raf) raf = requestAnimationFrame(update); };
     window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      cancelAnimationFrame(raf);
+    };
   }, []);
 
   // announcement strip rotates
@@ -141,7 +148,7 @@ export default function Header() {
         {/* ── Main bar (64px) ───────────────────────────────── */}
         <div
           className={`relative border-b transition-[background-color,border-color,box-shadow,color] duration-500 ${tone} ${
-            dark ? "border-white/10 bg-[#1a1229]" : "border-plum/10 bg-pearl/[0.97] shadow-[0_12px_40px_-24px_rgba(30,21,48,.35)] backdrop-blur-xl"
+            dark ? "border-white/10 bg-[#1a1229]" : "border-plum/10 bg-pearl shadow-[0_12px_40px_-24px_rgba(30,21,48,.35)]"
           }`}
         >
           <div className="mx-auto grid h-16 max-w-[1600px] grid-cols-[1fr_auto_1fr] items-center gap-4 px-[var(--gutter)]">
