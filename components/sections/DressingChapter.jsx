@@ -1,5 +1,6 @@
 "use client";
 import dynamic from "next/dynamic";
+import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { byId } from "@/lib/catalog";
 import { useApp } from "@/lib/store";
@@ -56,7 +57,7 @@ export default function DressingChapter() {
             ))}
           </ul>
           <div className="mt-12">
-            <Button as="a" href="/dressing-room" variant="light" ai data-cursor="Enter">
+            <Button as={Link} href="/dressing-room" variant="light" ai data-cursor="Enter">
               Enter the Dressing Room
             </Button>
           </div>
