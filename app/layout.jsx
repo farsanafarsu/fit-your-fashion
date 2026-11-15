@@ -1,4 +1,4 @@
-import { Cormorant_Garamond, Manrope, Mrs_Saint_Delafield } from "next/font/google";
+import { Cormorant_Garamond, Manrope, Mrs_Saint_Delafield, Unbounded } from "next/font/google";
 import "./globals.css";
 import { AppProvider } from "@/lib/store";
 import SmoothScroll from "@/components/SmoothScroll";
@@ -12,6 +12,8 @@ const serif = Cormorant_Garamond({ subsets: ["latin"], weight: ["400", "500", "6
 const sans = Manrope({ subsets: ["latin"], variable: "--font-body", display: "swap" });
 // Hand-signed script for the brand signature (preloader, footer).
 const script = Mrs_Saint_Delafield({ subsets: ["latin"], weight: "400", variable: "--font-script", display: "block" });
+// Extended grotesk for the hero's streetwear-scale wordmark.
+const wide = Unbounded({ subsets: ["latin"], weight: ["600", "800", "900"], variable: "--font-wide", display: "swap" });
 
 export const metadata = {
   title: "FIT YOUR FASHION — Wear the future",
@@ -22,7 +24,7 @@ export const viewport = { themeColor: "#1E1530", width: "device-width", initialS
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en" className={`${serif.variable} ${sans.variable} ${script.variable}`}>
+    <html lang="en" className={`${serif.variable} ${sans.variable} ${script.variable} ${wide.variable}`}>
       <body>
         <a href="#main" className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[200] focus:bg-white focus:px-4 focus:py-2">
           Skip to content

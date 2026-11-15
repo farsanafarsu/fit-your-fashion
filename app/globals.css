@@ -131,7 +131,22 @@ html[data-mood="bridal"] .ambience { background: radial-gradient(circle at 50% 4
 @keyframes haze { 0%, 100% { transform: translate3d(0, 0, 0) scale(1); } 50% { transform: translate3d(4%, -3%, 0) scale(1.08); } }
 @keyframes float-y { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
 @keyframes pan { from { transform: translateX(0); } to { transform: translateX(-50%); } }
-@keyframes hero-progress { from { width: 0%; } to { width: 100%; } }
+/* hero garment rail: the strip holds three copies, so sliding by a third loops seamlessly */
+@keyframes hx-rail { to { transform: translate3d(-33.3333%, 0, 0); } }
+.hx-marquee { animation: hx-rail 40s linear infinite; will-change: transform; }
+@media (prefers-reduced-motion: reduce) { .hx-marquee { animation: none; } }
+/* static star field, painted once */
+.hx-stars {
+  background-image:
+    radial-gradient(1px 1px at 12% 18%, rgba(255,255,255,.8), transparent),
+    radial-gradient(1px 1px at 27% 62%, rgba(255,255,255,.55), transparent),
+    radial-gradient(1.5px 1.5px at 41% 9%, rgba(255,255,255,.7), transparent),
+    radial-gradient(1px 1px at 58% 44%, rgba(255,255,255,.5), transparent),
+    radial-gradient(1px 1px at 73% 23%, rgba(255,255,255,.75), transparent),
+    radial-gradient(1.5px 1.5px at 86% 57%, rgba(255,255,255,.55), transparent),
+    radial-gradient(1px 1px at 94% 12%, rgba(255,255,255,.6), transparent);
+  background-size: 360px 300px;
+}
 @keyframes cue { 0% { transform: translateX(-100%); } 100% { transform: translateX(200%); } }
 @keyframes lav-pan { to { background-position: -200% 0; } }
 

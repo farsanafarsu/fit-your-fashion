@@ -128,7 +128,7 @@ export default function Header() {
         onMouseLeave={closeMega}
       >
         {/* ── Announcement strip (32px) ─────────────────────── */}
-        <div className="relative h-8 overflow-hidden bg-[#120c1f] text-pearl">
+        <div className={`relative h-8 overflow-hidden text-pearl transition-colors duration-500 ${dark && !menu ? "bg-[#06121f]/55" : "bg-[#120c1f]"}`}>
           <AnimatePresence mode="wait" initial={false}>
             <motion.button
               key={note}
@@ -148,7 +148,8 @@ export default function Header() {
         {/* ── Main bar (64px) ───────────────────────────────── */}
         <div
           className={`relative border-b transition-[background-color,border-color,box-shadow,color] duration-500 ${tone} ${
-            dark ? "border-white/10 bg-[#1a1229]" : "border-plum/10 bg-pearl shadow-[0_12px_40px_-24px_rgba(30,21,48,.35)]"
+            // over the homepage hero the bar is clear so the night sky runs up behind the nav
+            menu ? "border-white/10 bg-[#1a1229]" : dark ? "border-white/10 bg-transparent" :"border-plum/10 bg-pearl shadow-[0_12px_40px_-24px_rgba(30,21,48,.35)]"
           }`}
         >
           <div className="mx-auto grid h-16 max-w-[1600px] grid-cols-[1fr_auto_1fr] items-center gap-4 px-[var(--gutter)]">
