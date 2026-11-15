@@ -128,7 +128,7 @@ export default function Header() {
         onMouseLeave={closeMega}
       >
         {/* ── Announcement strip (32px) ─────────────────────── */}
-        <div className={`relative h-8 overflow-hidden text-pearl transition-colors duration-500 ${dark && !menu ? "bg-[#06121f]/55" : "bg-[#120c1f]"}`}>
+        <div className={`relative h-8 overflow-hidden text-pearl transition-colors duration-500 ${dark && !menu ? "bg-plum/45" : "bg-[#120c1f]"}`}>
           <AnimatePresence mode="wait" initial={false}>
             <motion.button
               key={note}

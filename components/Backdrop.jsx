@@ -9,7 +9,7 @@ import { useApp } from "@/lib/store";
 // sits on its own ground (a single shared, scroll-blended backdrop left dark sections half-light while
 // both were on screen). Sections marked [data-tint] stay transparent over this fixed layer, which
 // hovering a mood retints.
-const FIRST_FROM = "#08111f"; // the hero above the first chapter ends in its night-mountain navy
+const FIRST_FROM = "#1E1530"; // the hero above the first chapter ends in midnight plum
 
 export default function Backdrop() {
   const el = useRef(null);
