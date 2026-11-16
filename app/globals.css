@@ -152,7 +152,8 @@ html[data-mood="bridal"] .ambience { background: radial-gradient(circle at 50% 4
    from, and is carried out to the rail by these variables, so the hand-off never needs measuring:
    --rx/--ry  where the rail hangs, as an offset from the model   --rs  coat size on the rail
    --fx/--fy/--fs run 1 → 0 on scroll (rail → model); --fr and --lift add the swing of the flight. */
-.hx2 { --mh: 86svh; --rx: 15vw; --ry: -5svh; --rs: 0.76; --gap: 12.5svh; }
+/* desktop: small pieces spaced wider than they are, so nothing on the rail overlaps */
+.hx2 { --mh: 86svh; --rx: 9vw; --ry: 2svh; --rs: 0.44; --gap: 14svh; }
 @media (max-width: 767px) { .hx2 { --mh: 58svh; --rx: -22vw; --ry: 9svh; --rs: 0.62; --gap: 23vw; } }
 .hx2-figure { height: var(--mh); aspect-ratio: 611 / 1500; }
 .hx2-rail { transform: translate3d(var(--rx), var(--ry), 0); }

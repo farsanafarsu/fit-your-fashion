@@ -18,10 +18,10 @@ const COAT = { src: "/hero/look-ivory-coat.webp", w: 401, h: 640, name: "Ivory L
 const MODEL = { src: "/models/ivory-coat.webp", w: 611, h: 1500 };
 // k: height on the rail relative to the coat. Card positions are for the last beat.
 const RAIL = [
-  { src: "/hero/look-ivory-suit.webp", w: 492, h: 640, name: "Cocoon Jacket", k: 0.74, card: "left-[4vw] top-[17svh] md:left-[13vw] md:top-[20svh]" },
-  { src: "/hero/look-noir-blazer.webp", w: 396, h: 575, name: "Noir Blazer Dress", k: 0.86, card: "right-[4vw] top-[17svh] md:right-[13vw] md:top-[20svh]" },
-  { src: "/hero/look-sand-suit.webp", w: 664, h: 640, name: "Sand Power Suit", k: 0.8, card: "left-[4vw] bottom-[11svh] md:left-[17vw] md:bottom-[9svh]" },
-  { src: "/hero/look-slate-suit.webp", w: 330, h: 640, name: "Slate Wool Wrap", k: 0.98, card: "right-[4vw] bottom-[11svh] md:right-[17vw] md:bottom-[9svh]" },
+  { src: "/hero/look-ivory-suit.webp", w: 492, h: 640, name: "Cocoon Jacket", k: 0.72, card: "left-[4vw] top-[17svh] md:left-[13vw] md:top-[20svh]" },
+  { src: "/hero/look-noir-blazer.webp", w: 396, h: 575, name: "Noir Blazer Dress", k: 0.8, card: "right-[4vw] top-[17svh] md:right-[13vw] md:top-[20svh]" },
+  { src: "/hero/look-sand-suit.webp", w: 664, h: 640, name: "Sand Power Suit", k: 0.58, card: "left-[4vw] bottom-[11svh] md:left-[17vw] md:bottom-[9svh]" },
+  { src: "/hero/look-slate-suit.webp", w: 330, h: 640, name: "Slate Wool Wrap", k: 0.95, card: "right-[4vw] bottom-[11svh] md:right-[17vw] md:bottom-[9svh]" },
 ];
 const WORD = "Elegance";
 
@@ -154,10 +154,10 @@ export default function Hero({ ready }) {
           <div className="hx-railwrap absolute inset-0" aria-hidden>
             <div className="hx2-rail absolute inset-0 text-mist">
               {/* the rail: bar, two legs, a soft floor */}
-              <div className="hx-bar hx-in absolute left-[-34%] top-[calc(18.4%-3.3svh)] h-[3px] w-[calc(168%+var(--gap)*4)] rounded-full bg-gradient-to-r from-white/90 via-mist to-white/60" />
-              <div className="hx-bar hx-in absolute left-[-30%] top-[calc(18.4%-3.3svh)] h-[calc(var(--mh)*0.66)] w-[3px] rounded-full bg-gradient-to-b from-white/85 to-white/15" />
-              <div className="hx-bar hx-in absolute left-[calc(130%+var(--gap)*4)] top-[calc(18.4%-3.3svh)] h-[calc(var(--mh)*0.66)] w-[3px] rounded-full bg-gradient-to-b from-white/85 to-white/15" />
-              <div className="hx-bar hx-in absolute left-[-40%] top-[calc(18.4%+var(--mh)*0.6)] h-[5svh] w-[calc(180%+var(--gap)*4)] rounded-[50%] bg-[radial-gradient(closest-side,rgba(30,21,48,.38),transparent)]" />
+              <div className="hx-bar hx-in absolute left-[-34%] top-[calc(18.4%-3.3svh)] h-[3px] w-[calc(168%+var(--gap)*4)] md:left-[20%] md:w-[calc(114%+var(--gap)*4)] rounded-full bg-gradient-to-r from-white/90 via-mist to-white/60" />
+              <div className="hx-bar hx-in absolute left-[-30%] md:left-[24%] top-[calc(18.4%-3.3svh)] h-[calc(var(--mh)*0.66)] w-[3px] rounded-full bg-gradient-to-b from-white/85 to-white/15 md:h-[calc(var(--mh)*0.46)]" />
+              <div className="hx-bar hx-in absolute left-[calc(130%+var(--gap)*4)] top-[calc(18.4%-3.3svh)] h-[calc(var(--mh)*0.66)] md:h-[calc(var(--mh)*0.46)] w-[3px] rounded-full bg-gradient-to-b from-white/85 to-white/15" />
+              <div className="hx-bar hx-in absolute left-[-40%] top-[calc(18.4%+var(--mh)*0.6)] h-[5svh] md:top-[calc(18.4%+var(--mh)*0.4)] w-[calc(180%+var(--gap)*4)] rounded-[50%] bg-[radial-gradient(closest-side,rgba(30,21,48,.38),transparent)]" />
               {/* the coat's hanger stays behind when it flies */}
               <Hook className="hx-hang absolute left-1/2 top-[calc(18.4%-3.1svh)] -ml-[2svh] h-[3.2svh] w-[4svh]" />
               {RAIL.map((g, n) => (
@@ -167,7 +167,7 @@ export default function Hero({ ready }) {
                   style={{ left: `calc(50% + var(--gap) * ${n + 1})`, zIndex: 9 - n, height: `calc(64.87% * var(--rs) * ${g.k})` }}
                 >
                   <Hook className="absolute bottom-full left-1/2 -mb-[0.2svh] -ml-[2svh] h-[3.2svh] w-[4svh]" />
-                  <Image src={g.src} alt="" width={g.w} height={g.h} sizes="260px" priority className="h-full w-auto max-w-none [mask-image:linear-gradient(transparent,#000_7%)]" />
+                  <Image src={g.src} alt="" width={g.w} height={g.h} sizes="260px" priority className="h-full w-auto max-w-none drop-shadow-[0_14px_14px_rgba(30,21,48,.22)]" />
                 </div>
               ))}
             </div>
@@ -184,7 +184,7 @@ export default function Hero({ ready }) {
           <div
             className="hx-coat hx2-coat absolute left-0 top-[18.4%] z-10 h-[64.87%] w-full will-change-transform"
           >
-            <Image src={COAT.src} alt="" width={COAT.w} height={COAT.h} priority sizes="(max-width: 767px) 60vw, 40vw" className="hx-hang h-full w-full [mask-image:linear-gradient(transparent,#000_6%,#000_94%,transparent)]" />
+            <Image src={COAT.src} alt="" width={COAT.w} height={COAT.h} priority sizes="(max-width: 767px) 60vw, 40vw" className="hx-hang h-full w-full" />
           </div>
         </div>
 
