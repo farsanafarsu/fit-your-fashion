@@ -2,46 +2,35 @@
 import Image from "next/image";
 import { useEffect, useRef } from "react";
 import { gsap } from "gsap"; // ScrollTrigger is registered once in SmoothScroll
+import { formatPrice } from "@/lib/catalog";
 import { useApp } from "@/lib/store";
 import { Spark } from "../ui/primitives";
 
-// Streetwear-scale poster hero: a full-width extended wordmark under a lavender dusk sky, a "New
-// Arrival" pill, a slow rail of floating garments, and below it a winged statue rising out of
-// lavender-lit mountains. Layers drift apart on scroll.
+// Scroll-film hero. The page pins for three screens while one take plays:
+//   1. a block wordmark beside a rail of garments
+//   2. the ivory coat lifts off the rail, swings to centre stage and the model steps into it
+//   3. ELEGANCE rises behind her
+//   4. the word clears and the rest of the rail returns as shoppable cards around her
+// The coat image is a crop of the model photo (top 18.4%, 64.87% tall), so it lands on her exactly.
+// Positions live in CSS variables (.hx2 in globals.css), so nothing is measured and resizing is free.
 // PLACEHOLDER imagery: Unsplash stock (see public/hero/CREDITS.md).
+const COAT = { src: "/hero/look-ivory-coat.webp", w: 401, h: 640, name: "Ivory Long Coat" };
+const MODEL = { src: "/models/ivory-coat.webp", w: 611, h: 1500 };
+// k: height on the rail relative to the coat. Card positions are for the last beat.
 const RAIL = [
-  { src: "/hero/look-ivory-coat.webp", w: 401, h: 640, name: "Ivory Long Coat" },
-  { src: "/hero/look-noir-blazer.webp", w: 396, h: 575, name: "Noir Blazer Dress" },
-  { src: "/hero/look-ivory-suit.webp", w: 492, h: 640, name: "Cocoon Jacket" },
-  { src: "/hero/look-midnight-embellished.webp", w: 404, h: 640, name: "Starlit Embellished Set" },
-  { src: "/hero/look-sand-suit.webp", w: 664, h: 640, name: "Sand Power Suit" },
-  { src: "/hero/look-slate-suit.webp", w: 330, h: 640, name: "Slate Wool Wrap" },
+  { src: "/hero/look-ivory-suit.webp", w: 492, h: 640, name: "Cocoon Jacket", k: 0.74, card: "left-[4vw] top-[17svh] md:left-[13vw] md:top-[20svh]" },
+  { src: "/hero/look-noir-blazer.webp", w: 396, h: 575, name: "Noir Blazer Dress", k: 0.86, card: "right-[4vw] top-[17svh] md:right-[13vw] md:top-[20svh]" },
+  { src: "/hero/look-sand-suit.webp", w: 664, h: 640, name: "Sand Power Suit", k: 0.8, card: "left-[4vw] bottom-[11svh] md:left-[17vw] md:bottom-[9svh]" },
+  { src: "/hero/look-slate-suit.webp", w: 330, h: 640, name: "Slate Wool Wrap", k: 0.98, card: "right-[4vw] bottom-[11svh] md:right-[17vw] md:bottom-[9svh]" },
 ];
-const WORD = "FIT YOUR FASHION";
+const WORD = "Elegance";
 
-function Garment({ g, hidden }) {
+function Hook({ className = "" }) {
   return (
-    <a
-      href="#shop"
-      className="group/g relative flex shrink-0 flex-col items-center px-[clamp(14px,2.2vw,36px)]"
-      aria-hidden={hidden || undefined}
-      tabIndex={hidden ? -1 : undefined}
-      data-cursor="Shop"
-    >
-      <Image
-        src={g.src}
-        alt={hidden ? "" : g.name}
-        width={g.w}
-        height={g.h}
-        sizes="240px"
-        className="h-[clamp(120px,19svh,210px)] w-auto transition-transform duration-500 ease-[var(--ease-film)] group-hover/g:-translate-y-2"
-      />
-      {/* soft floor shadow (a gradient, not a filter: these move every frame) */}
-      <span className="mt-1 h-3 w-3/4 rounded-[50%] bg-[radial-gradient(closest-side,rgba(0,8,20,.55),transparent)]" aria-hidden />
-      <span className="label-sm pointer-events-none absolute -bottom-5 whitespace-nowrap text-[9.5px] text-white/0 transition-colors duration-300 group-hover/g:text-white/80">
-        {g.name}
-      </span>
-    </a>
+    <svg viewBox="0 0 40 30" className={className} fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" aria-hidden>
+      <path d="M20 12V7.5a4 4 0 1 0-4-4" />
+      <path d="M20 12 3 25h34L20 12Z" strokeLinejoin="round" />
+    </svg>
   );
 }
 
@@ -49,8 +38,51 @@ export default function Hero({ ready }) {
   const root = useRef(null);
   const { askStylist } = useApp();
 
-  // Hold everything back under the preloader, then assemble: wordmark letters rise, the rail glides
-  // in, the statue climbs out from behind the mountains. Scroll pulls the layers apart.
+  // The take: one scrubbed, pinned timeline. Built on mount (not when the preloader ends) so the pins
+  // further down the page are measured after this one, in page order.
+  useEffect(() => {
+    const ctx = gsap.context(() => {
+      const mm = gsap.matchMedia();
+      mm.add({ reduce: "(prefers-reduced-motion: reduce)", ok: "(prefers-reduced-motion: no-preference)" }, ({ conditions }) => {
+        if (conditions.reduce) {
+          gsap.set(".hx-elegance", { autoAlpha: 0 }); // calm version: the opening frame, unpinned
+          return;
+        }
+        gsap.set(".hx-e", { yPercent: 110 });
+        gsap.set(".hx-card", { y: 44, scale: 0.9 });
+
+        gsap.timeline({
+          defaults: { ease: "power2.inOut" },
+          scrollTrigger: { trigger: root.current, start: "top top", end: () => "+=" + window.innerHeight * 3.2, pin: true, scrub: 0.7, invalidateOnRefresh: true },
+        })
+          // 1 → 2: the coat leaves the rail
+          .to(".hx-coat", { "--lift": -9, duration: 0.9, ease: "power2.out" }, 0)
+          .to(".hx-coat", { "--fr": -15, duration: 0.9, ease: "power2.out" }, 0)
+          .to(".hx-coat", { "--fx": 0, "--fs": 0, duration: 2.3 }, 0.15)
+          .to(".hx-coat", { "--fy": 0, duration: 2.1 }, 0.35)
+          .to(".hx-coat", { "--fr": 7, duration: 1 }, 0.9)
+          .to(".hx-coat", { "--lift": 0, duration: 1.5 }, 0.9)
+          .to(".hx-coat", { "--fr": 0, duration: 0.7, ease: "power2.out" }, 1.9)
+          .to(".hx-cue", { autoAlpha: 0, duration: 0.4 }, 0)
+          .to(".hx-wordwrap", { xPercent: -18, autoAlpha: 0, duration: 1.2 }, 0.1)
+          .to(".hx-railwrap", { x: () => window.innerWidth * 0.22, autoAlpha: 0, duration: 1.3 }, 0.25)
+          // she steps into it
+          .to(".hx-model", { opacity: 1, duration: 0.5, ease: "none" }, 2.3)
+          .to(".hx-coat", { opacity: 0, duration: 0.3, ease: "none" }, 2.8)
+          // 3: ELEGANCE
+          .to(".hx-kicker", { opacity: 1, duration: 0.5 }, 3)
+          .to(".hx-e", { yPercent: 0, duration: 0.9, stagger: 0.06, ease: "power3.out" }, 3)
+          // 4: the word clears, the rail comes back as cards
+          .to(".hx-elegance", { yPercent: -70, opacity: 0, duration: 1 }, 5.1)
+          .to(".hx-figure", { scale: 0.93, duration: 1 }, 5.1)
+          .to(".hx-card", { autoAlpha: 1, y: 0, scale: 1, duration: 0.8, stagger: 0.12, ease: "power3.out" }, 5.5)
+          .to({}, { duration: 0.9 }); // hold the last frame before the page moves on
+      });
+    }, root);
+    return () => ctx.revert();
+  }, []);
+
+  // Arrival, held back under the preloader: the wordmark rises, the garments drop onto the rail one by one.
   useEffect(() => {
     const ctx = gsap.context(() => {
       const mm = gsap.matchMedia();
@@ -59,112 +91,139 @@ export default function Hero({ ready }) {
           gsap.set(".hx-in", { opacity: 1 });
           return;
         }
-        gsap.set(".hx-char", { yPercent: 115 });
+        gsap.set(".hx-char", { yPercent: 112 });
         gsap.set(".hx-in", { opacity: 0 });
-        gsap.set(".hx-angel", { yPercent: 38 });
-        gsap.set(".hx-range", { yPercent: 18 });
-        gsap.set(".hx-rail", { x: 160 });
+        gsap.set(".hx-hang", { y: -46, opacity: 0 });
         if (!ready) return;
-
         gsap.timeline({ defaults: { ease: "expo.out" } })
-          .to(".hx-char", { yPercent: 0, duration: 1.2, stagger: 0.035 }, 0)
-          .to(".hx-range", { yPercent: 0, opacity: 1, duration: 1.6 }, 0.1)
-          .to(".hx-angel", { yPercent: 0, opacity: 1, duration: 2.2 }, 0.3)
-          .fromTo(".hx-quote", { y: 14 }, { y: 0, opacity: 1, duration: 1.1 }, 0.55)
-          .to(".hx-pill", { opacity: 1, duration: 0.8 }, 0.7)
-          .to(".hx-rail", { x: 0, opacity: 1, duration: 1.6 }, 0.75)
-          .to(".hx-corner", { opacity: 1, duration: 0.8, stagger: 0.1 }, 1.1);
-
-        // depth on scroll: transforms only, scrubbed, no pin
-        gsap.timeline({ scrollTrigger: { trigger: root.current, start: "top top", end: "bottom top", scrub: true } })
-          .to(".hx-word", { yPercent: -45, ease: "none" }, 0)
-          .to(".hx-rail-wrap", { y: -90, ease: "none" }, 0)
-          .to(".hx-angel-wrap", { y: -70, ease: "none" }, 0)
-          .to(".hx-range-wrap", { y: 40, ease: "none" }, 0);
+          .to(".hx-char", { yPercent: 0, duration: 1.2, stagger: 0.03 }, 0)
+          .to(".hx-bar", { opacity: 1, duration: 0.8 }, 0.15)
+          .to(".hx-hang", { y: 0, opacity: 1, duration: 1.3, stagger: 0.09 }, 0.3)
+          .to(".hx-line", { opacity: 1, duration: 1 }, 0.6)
+          .to(".hx-corner", { opacity: 1, duration: 0.8, stagger: 0.1 }, 1);
       });
     }, root);
     return () => ctx.revert();
   }, [ready]);
 
   return (
-    <section
-      ref={root}
-      data-hero
-      className="on-dark relative isolate flex h-[100svh] min-h-[680px] flex-col overflow-hidden text-white"
-      aria-label="Fit Your Fashion — Season 01"
-    >
-      {/* ── Lavender dusk: amethyst overhead, a lavender glow at the horizon, plum below ── */}
-      <div className="absolute inset-0 -z-10 bg-[linear-gradient(180deg,#3b2a63_0%,#55408a_24%,#7660ae_44%,#9580c6_60%,#7a63b2_72%,#4a3778_86%,#1e1530_100%)]" aria-hidden />
-      <div className="hx-stars absolute inset-0 -z-10 opacity-60" aria-hidden />
-      <div className="absolute inset-x-0 bottom-0 -z-10 h-[70%] bg-[radial-gradient(ellipse_45%_50%_at_50%_68%,rgba(233,223,245,.45),transparent_70%)]" aria-hidden />
+    <div>
+      {/* own wrapper: GSAP inserts its pin-spacer here, outside React's sibling list */}
+      <section
+        ref={root}
+        data-hero
+        className="hx2 on-dark relative isolate h-[100svh] min-h-[600px] overflow-hidden text-white"
+        aria-label="Fit Your Fashion — Season 01"
+      >
+        <div className="hx2-ground absolute inset-0 -z-10" aria-hidden />
+        <div className="grain pointer-events-none absolute inset-0 -z-10" aria-hidden />
 
-      {/* ── Wordmark + pill + rail (below the 97px header) ─ */}
-      <div className="relative z-30 flex flex-col items-center pt-[calc(97px+2.2svh)]">
-        <h1 className="hx-word w-full overflow-hidden text-center font-[family-name:var(--font-wide)] font-extrabold uppercase leading-[0.92] tracking-[-0.03em] text-[#eef3f8]">
-          <span className="sr-only">Fit Your Fashion</span>
-          {/* one line on wide screens; phones wrap to FIT YOUR / FASHION so the type stays big */}
-          <span aria-hidden className="block text-[12.5vw] sm:whitespace-nowrap sm:text-[min(7.6vw,15svh)]">
-            {WORD.split(" ").map((w, wi) => (
-              <span key={wi}>
-                {wi > 0 && " "}
-                <span className="inline-block overflow-hidden pb-[0.04em] align-top">
-                  {[...w].map((c, ci) => (
-                    <span key={ci} className="hx-char inline-block">{c}</span>
-                  ))}
-                </span>
-              </span>
-            ))}
-          </span>
-        </h1>
+        {/* ── 1. Wordmark ─────────────────────────────────── */}
+        <div className="hx-wordwrap absolute inset-x-0 top-[calc(97px+3svh)] z-30 px-[var(--gutter)] md:inset-x-auto md:left-0 md:top-1/2 md:-translate-y-[46%]">
+          <h1 className="block-word text-[#f6f1fc] drop-shadow-[0_10px_30px_rgba(30,21,48,.28)]">
+            <span className="sr-only">Fit Your Fashion</span>
+            <span aria-hidden className="block overflow-hidden pb-[0.05em] text-[8.4vw] md:text-[min(3.7vw,7.4svh)]">
+              {[..."FIT YOUR"].map((c, i) => <span key={i} className="hx-char inline-block whitespace-pre">{c}</span>)}
+            </span>
+            <span aria-hidden className="block overflow-hidden pb-[0.05em] text-[15.4vw] md:text-[min(8.3vw,17svh)]">
+              {[..."FASHION"].map((c, i) => <span key={i} className="hx-char inline-block">{c}</span>)}
+            </span>
+          </h1>
+          <p className="hx-line hx-in label mt-[1.6svh] text-[10px] tracking-[0.42em] text-white/85 md:mt-[2.4svh] md:text-[11px]">
+            Wear the future · Cut to fit only you
+          </p>
+          <a
+            href="#shop"
+            className="hx-line hx-in mt-[2.2svh] inline-block rounded-full border-2 border-white/85 px-6 py-2 text-[14px] font-semibold text-white transition-colors hover:bg-white hover:text-plum md:mt-[3.4svh] sm:text-[15px]"
+            data-cursor="Shop"
+          >
+            New Arrival
+          </a>
+        </div>
 
-        {/* the quiet serif line against the loud wordmark */}
-        <p className="hx-quote hx-in display-i mt-[1.2svh] px-6 text-center text-[clamp(19px,2.3vw,32px)] leading-tight text-mist">
-          Wear the future <span className="text-lavender">—</span> cut to fit only you.
-        </p>
+        {/* ── 3. ELEGANCE, behind the model ───────────────── */}
+        <div className="hx-elegance pointer-events-none absolute inset-x-0 top-[27svh] z-10 text-center md:top-[24svh]" aria-hidden>
+          <p className="hx-kicker label mb-[1svh] opacity-0 text-[10px] tracking-[0.5em] text-white/85 md:mr-[52vw] md:text-[11px]">A touch of timeless</p>
+          <p className="block-word overflow-hidden whitespace-nowrap pb-[0.06em] text-[12vw] text-[#f6f1fc] md:text-[min(12vw,34svh)]">
+            {[...WORD].map((c, i) => <span key={i} className="hx-e inline-block">{c}</span>)}
+          </p>
+        </div>
 
-        <a
-          href="#shop"
-          className="hx-pill hx-in mt-[2svh] rounded-full border-2 border-white/85 px-6 py-2 text-[14px] font-semibold tracking-[0.01em] text-white transition-colors hover:bg-white hover:text-plum sm:text-[15px]"
-          data-cursor="Shop"
-        >
-          New Arrival
-        </a>
-
-        {/* garment rail: three copies (one set is narrower than a wide screen); sliding by a third loops */}
-        <div className="hx-rail-wrap mt-[2.6svh] w-full">
-          <div className="hx-rail hx-in group/rail overflow-hidden [mask-image:linear-gradient(90deg,transparent,#000_7%,#000_93%,transparent)]">
-            <div className="hx-marquee flex w-max items-end pb-6 group-hover/rail:[animation-play-state:paused]">
-              {[...RAIL, ...RAIL, ...RAIL].map((g, n) => <Garment key={n} g={g} hidden={n >= RAIL.length} />)}
+        {/* ── The figure: model, coat and the rail it starts on ── */}
+        <div className="hx-figure hx2-figure absolute bottom-0 left-1/2 z-20 -ml-[calc(var(--mh)*0.20367)] origin-bottom">
+          <div className="hx-railwrap absolute inset-0" aria-hidden>
+            <div className="hx2-rail absolute inset-0 text-mist">
+              {/* the rail: bar, two legs, a soft floor */}
+              <div className="hx-bar hx-in absolute left-[-34%] top-[calc(18.4%-3.3svh)] h-[3px] w-[calc(168%+var(--gap)*4)] rounded-full bg-gradient-to-r from-white/90 via-mist to-white/60" />
+              <div className="hx-bar hx-in absolute left-[-30%] top-[calc(18.4%-3.3svh)] h-[calc(var(--mh)*0.66)] w-[3px] rounded-full bg-gradient-to-b from-white/85 to-white/15" />
+              <div className="hx-bar hx-in absolute left-[calc(130%+var(--gap)*4)] top-[calc(18.4%-3.3svh)] h-[calc(var(--mh)*0.66)] w-[3px] rounded-full bg-gradient-to-b from-white/85 to-white/15" />
+              <div className="hx-bar hx-in absolute left-[-40%] top-[calc(18.4%+var(--mh)*0.6)] h-[5svh] w-[calc(180%+var(--gap)*4)] rounded-[50%] bg-[radial-gradient(closest-side,rgba(30,21,48,.38),transparent)]" />
+              {/* the coat's hanger stays behind when it flies */}
+              <Hook className="hx-hang absolute left-1/2 top-[calc(18.4%-3.1svh)] -ml-[2svh] h-[3.2svh] w-[4svh]" />
+              {RAIL.map((g, n) => (
+                <div
+                  key={g.src}
+                  className="hx-hang absolute top-[18.4%] -translate-x-1/2"
+                  style={{ left: `calc(50% + var(--gap) * ${n + 1})`, zIndex: 9 - n, height: `calc(64.87% * var(--rs) * ${g.k})` }}
+                >
+                  <Hook className="absolute bottom-full left-1/2 -mb-[0.2svh] -ml-[2svh] h-[3.2svh] w-[4svh]" />
+                  <Image src={g.src} alt="" width={g.w} height={g.h} sizes="260px" priority className="h-full w-auto max-w-none [mask-image:linear-gradient(transparent,#000_7%)]" />
+                </div>
+              ))}
             </div>
           </div>
-        </div>
-      </div>
 
-      {/* ── Statue scene: the angel rising out of the mountains ─ */}
-      <div className="pointer-events-none absolute inset-x-0 bottom-0 h-[47svh] min-h-[320px]" aria-hidden>
-        <div className="hx-angel-wrap absolute bottom-[4%] left-1/2 z-10 h-[80%] -translate-x-1/2">
-          <Image src="/hero/angel.webp" alt="" width={468} height={941} priority sizes="(max-width: 640px) 60vw, 26vw" className="hx-angel hx-in h-full w-auto" />
+          <Image
+            src={MODEL.src}
+            alt="Model wearing the Ivory Long Coat"
+            width={MODEL.w}
+            height={MODEL.h}
+            sizes="(max-width: 767px) 60vw, 40vw"
+            className="hx-model absolute inset-0 h-full w-full opacity-0 drop-shadow-[0_30px_40px_rgba(30,21,48,.3)]"
+          />
+          <div
+            className="hx-coat hx2-coat absolute left-0 top-[18.4%] z-10 h-[64.87%] w-full will-change-transform"
+          >
+            <Image src={COAT.src} alt="" width={COAT.w} height={COAT.h} priority sizes="(max-width: 767px) 60vw, 40vw" className="hx-hang h-full w-full [mask-image:linear-gradient(transparent,#000_6%,#000_94%,transparent)]" />
+          </div>
         </div>
-        <div className="hx-range-wrap absolute inset-x-0 -bottom-[2%] z-20 h-[46%] sm:h-[52%]">
-          <Image src="/hero/range.webp" alt="" fill priority sizes="100vw" className="hx-range hx-in object-cover object-top" />
-        </div>
-        <div className="absolute inset-x-0 bottom-0 z-20 h-[24%] bg-gradient-to-t from-plum to-transparent" />
-      </div>
 
-      {/* ── Corners ─────────────────────────────────────── */}
-      <div className="absolute inset-x-0 bottom-0 z-40 flex items-end justify-between px-[var(--gutter)] pb-[max(1.1rem,env(safe-area-inset-bottom))] md:pb-7">
-        <p className="hx-corner hx-in label-sm hidden items-center gap-2 text-white/75 sm:flex">
-          <Spark className="h-3 w-3" animate={false} /> Season 01 · The Lavender Hour
+        {/* ── 4. The rail, back as cards ──────────────────── */}
+        {RAIL.map((g) => (
+          <a
+            key={g.name}
+            href="#shop"
+            className={`hx-card group/c invisible absolute z-30 w-[clamp(104px,26vw,132px)] opacity-0 md:w-[clamp(150px,13.5vw,210px)] ${g.card}`}
+            data-cursor="Shop"
+          >
+            <Image src={g.src} alt={g.name} width={g.w} height={g.h} sizes="200px" className="mx-auto h-[clamp(84px,13svh,170px)] w-auto transition-transform duration-500 ease-[var(--ease-film)] group-hover/c:-translate-y-2 md:h-[clamp(110px,21svh,220px)]" />
+            <span className="-mt-3 flex items-center justify-between gap-2 rounded-2xl bg-white/92 px-3 py-2.5 text-plum shadow-[0_18px_40px_-18px_rgba(30,21,48,.6)] md:px-4 md:py-3">
+              <span className="min-w-0">
+                <span className="display block text-[14px] leading-tight md:truncate md:text-[19px]">{g.name}</span>
+                <span className="label-sm mt-0.5 block text-[9px] text-plum/55 md:text-[10px]" title="Placeholder price">{formatPrice()}</span>
+              </span>
+              <span className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-plum text-[15px] leading-none text-pearl transition-colors group-hover/c:bg-amethyst" aria-hidden>+</span>
+            </span>
+          </a>
+        ))}
+
+        {/* ── Corners ─────────────────────────────────────── */}
+        <div className="absolute inset-x-0 bottom-0 z-40 flex items-end justify-between px-[var(--gutter)] pb-[max(1.1rem,env(safe-area-inset-bottom))] md:pb-7">
+          <p className="hx-corner hx-in label-sm hidden items-center gap-2 text-white/80 sm:flex">
+            <Spark className="h-3 w-3" animate={false} /> Season 01 · The Lavender Hour
+          </p>
+          <button
+            onClick={() => askStylist("Style me a look from the new arrivals")}
+            className="hx-corner hx-in label-sm ml-auto flex items-center gap-2 rounded-full border border-white/30 bg-plum/55 px-4 py-2.5 text-white/90 transition-colors hover:bg-white hover:text-plum"
+            data-cursor="Ask"
+          >
+            <Spark className="h-3 w-3" /> Style me with AI
+          </button>
+        </div>
+        <p className="hx-cue absolute hidden sm:block bottom-[max(1.6rem,env(safe-area-inset-bottom))] left-1/2 z-40 -translate-x-1/2 md:bottom-8">
+          <span className="hx-corner hx-in label-sm block text-white/75">Scroll <span className="ml-1 inline-block motion-safe:animate-bounce" aria-hidden>↓</span></span>
         </p>
-        <button
-          onClick={() => askStylist("Style me a look from the new arrivals")}
-          className="hx-corner hx-in label-sm ml-auto flex items-center gap-2 rounded-full border border-white/30 bg-plum/55 px-4 py-2.5 text-white/90 transition-colors hover:bg-white hover:text-plum"
-          data-cursor="Ask"
-        >
-          <Spark className="h-3 w-3" /> Style me with AI
-        </button>
-      </div>
-      <p className="hx-corner hx-in label-sm absolute bottom-1 left-1/2 z-40 hidden -translate-x-1/2 text-[8.5px] text-white/30 md:block">Placeholder imagery · Unsplash</p>
-    </section>
+      </section>
+    </div>
   );
 }
