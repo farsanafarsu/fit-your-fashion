@@ -4,6 +4,7 @@ import Intro from "./Intro";
 import Reveals from "./Reveals";
 import Backdrop from "./Backdrop";
 import Hero from "./sections/Hero";
+import Accessories from "./sections/Accessories";
 import Collection from "./sections/Collection";
 import Ticker from "./sections/Ticker";
 import DressingChapter from "./sections/DressingChapter";
@@ -29,6 +30,7 @@ export default function Home() {
       <main id="main">
         <Hero ready={ready} />
         <Ticker />
+        <Accessories />
         <ShopByCategory />
         <Collection />
         <ShopEdit />

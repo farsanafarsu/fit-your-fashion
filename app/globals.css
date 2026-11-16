@@ -147,6 +147,30 @@ html[data-mood="bridal"] .ambience { background: radial-gradient(circle at 50% 4
     radial-gradient(1px 1px at 94% 12%, rgba(255,255,255,.6), transparent);
   background-size: 360px 300px;
 }
+/* ── Scroll-film hero + accessories (components/sections/Hero.jsx, Accessories.jsx) ──
+   The figure box is the model's final place. The coat sits inside it at the exact crop it was cut
+   from, and is carried out to the rail by these variables, so the hand-off never needs measuring:
+   --rx/--ry  where the rail hangs, as an offset from the model   --rs  coat size on the rail
+   --fx/--fy/--fs run 1 → 0 on scroll (rail → model); --fr and --lift add the swing of the flight. */
+.hx2 { --mh: 86svh; --rx: 15vw; --ry: -5svh; --rs: 0.76; --gap: 12.5svh; }
+@media (max-width: 767px) { .hx2 { --mh: 58svh; --rx: -22vw; --ry: 9svh; --rs: 0.62; --gap: 23vw; } }
+.hx2-figure { height: var(--mh); aspect-ratio: 611 / 1500; }
+.hx2-rail { transform: translate3d(var(--rx), var(--ry), 0); }
+.hx2-coat {
+  --fx: 1; --fy: 1; --fs: 1; --fr: 0; --lift: 0; /* defaults here, not inline: GSAP clears inline custom properties when it reverts */
+  transform-origin: 50% 0;
+  transform:
+    translate3d(calc(var(--rx) * var(--fx)), calc(var(--ry) * var(--fy) + var(--lift) * 1svh), 0)
+    rotate(calc(var(--fr) * 1deg))
+    scale(calc(1 + (var(--rs) - 1) * var(--fs)));
+}
+.hx2-ground { background: radial-gradient(ellipse 70% 80% at 62% 42%, #b09bdc 0%, #9179c8 38%, #7557b0 72%, #5f4397 100%); }
+/* block wordmarks: pearl on amethyst, with the soft drop the reference film uses */
+.block-word { font-family: var(--font-wide), var(--font-sans); font-weight: 900; text-transform: uppercase; letter-spacing: -0.035em; line-height: 0.88; }
+.ax-word { color: #fff; text-shadow: 0 1px 0 #e3d8f3, 0 18px 40px rgba(110, 79, 168, 0.35), 0 2px 6px rgba(110, 79, 168, 0.25); }
+.float-a { animation: float-y 6s ease-in-out infinite; }
+.float-b { animation: float-y 7.5s ease-in-out -2s infinite; }
+.float-c { animation: float-y 5.2s ease-in-out -1s infinite; }
 @keyframes cue { 0% { transform: translateX(-100%); } 100% { transform: translateX(200%); } }
 @keyframes lav-pan { to { background-position: -200% 0; } }
 
