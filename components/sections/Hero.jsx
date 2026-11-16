@@ -6,12 +6,6 @@ import { gsap } from "gsap"; // ScrollTrigger is registered once in SmoothScroll
 // Boutique hero: block wordmark and calls to action on the left, a lavender boutique scene (arch,
 // rail of gowns, plinths) on the right. The scene is one image whose edges are masked away so it
 // sits in the CSS ground (.hb-ground / .hb-art in globals.css). Text is live; nothing is pinned.
-const THUMBS = [
-  { src: "/products/aurora-gown.webp", pos: "50% 22%" },
-  { src: "/products/nocturne-blazer.webp", pos: "50% 30%" },
-  { src: "/products/mist-drape.webp", pos: "55% 25%" },
-];
-
 export default function Hero({ ready }) {
   const root = useRef(null);
 
@@ -78,19 +72,6 @@ export default function Hero({ ready }) {
             View Lookbook
           </a>
         </div>
-
-        {/* explore strip */}
-        <a href="#collection" className="hb-in group/x absolute bottom-[max(1.6rem,env(safe-area-inset-bottom))] left-[max(var(--gutter),7.4vw)] hidden items-center gap-6 md:bottom-[9svh] md:flex" data-cursor="Explore">
-          <span className="flex -space-x-2">
-            {THUMBS.map((t) => (
-              <span key={t.src} className="relative block h-14 w-14 overflow-hidden rounded-full border-2 border-white/90 bg-mist">
-                <Image src={t.src} alt="" fill sizes="56px" className="object-cover" style={{ objectPosition: t.pos }} />
-              </span>
-            ))}
-          </span>
-          <span className="h-px w-10 bg-white/60 transition-all group-hover/x:w-14" aria-hidden />
-          <span className="text-[14px] leading-snug text-white/95">Explore the<br />New Collection</span>
-        </a>
       </div>
     </section>
   );
