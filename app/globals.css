@@ -165,6 +165,14 @@ html[data-mood="bridal"] .ambience { background: radial-gradient(circle at 50% 4
     rotate(calc(var(--fr) * 1deg))
     scale(calc(1 + (var(--rs) - 1) * var(--fs)));
 }
+/* Boutique hero: ground colours sampled from the scene image; the image's edges are masked into it */
+.hb-ground { background: linear-gradient(180deg, #a583cf 0%, #ae8ed2 30%, #b695da 62%, #c39ce5 100%); }
+.hb-art {
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 13%, #000 90%, transparent), linear-gradient(180deg, transparent, #000 12%);
+  mask-image: linear-gradient(90deg, transparent, #000 13%, #000 90%, transparent), linear-gradient(180deg, transparent, #000 12%);
+  -webkit-mask-composite: source-in;
+  mask-composite: intersect;
+}
 .hx2-ground { background: radial-gradient(ellipse 70% 80% at 62% 42%, #b09bdc 0%, #9179c8 38%, #7557b0 72%, #5f4397 100%); }
 /* block wordmarks: pearl on amethyst, with the soft drop the reference film uses */
 .block-word { font-family: var(--font-wide), var(--font-sans); font-weight: 900; text-transform: uppercase; letter-spacing: -0.035em; line-height: 0.88; }
