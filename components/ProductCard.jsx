@@ -3,6 +3,7 @@ import Link from "next/link";
 import { formatPrice } from "@/lib/catalog";
 import { useApp } from "@/lib/store";
 import GarmentArt from "./ui/GarmentArt";
+import { TRYON_ENABLED } from "./tryon/config";
 
 // Editorial product card: second angle crossfades in on hover.
 export default function ProductCard({ product, index, className = "", aspect = "aspect-[3/4]", dark = false }) {
@@ -33,6 +34,20 @@ export default function ProductCard({ product, index, className = "", aspect = "
           </div>
         </div>
       </Link>
+      {/* live try-on: any element with class "tryon-btn" + data-image opens it (see components/tryon) */}
+      {TRYON_ENABLED && product.photo?.src && (
+        <button
+          type="button"
+          className="tryon-btn label-sm absolute left-2 top-2 flex items-center gap-1.5 rounded-full bg-plum/85 px-3.5 py-2.5 text-pearl transition hover:bg-plum"
+          data-id={product.id}
+          data-name={product.name}
+          data-image={product.photo.src}
+          data-cursor="Try on"
+        >
+          <svg viewBox="0 0 24 24" className="h-3.5 w-3.5" fill="none" stroke="currentColor" strokeWidth="1.6" aria-hidden><path d="M4 8V6a2 2 0 0 1 2-2h2M16 4h2a2 2 0 0 1 2 2v2M20 16v2a2 2 0 0 1-2 2h-2M8 20H6a2 2 0 0 1-2-2v-2" /><circle cx="12" cy="12" r="3" /></svg>
+          Try it on
+        </button>
+      )}
       <button
         onClick={() => toggleWish(product.id)}
         aria-pressed={saved}

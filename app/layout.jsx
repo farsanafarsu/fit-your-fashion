@@ -6,6 +6,7 @@ import Cursor from "@/components/Cursor";
 import Header from "@/components/Header";
 import Overlays from "@/components/overlays/Overlays";
 import Sound from "@/components/Sound";
+import TryOnRoot from "@/components/tryon/TryOnRoot";
 
 // Couture serif for display type, a quiet geometric sans for everything you read or tap.
 const serif = Cormorant_Garamond({ subsets: ["latin"], weight: ["400", "500", "600"], style: ["normal", "italic"], variable: "--font-serif", display: "swap" });
@@ -34,6 +35,7 @@ export default function RootLayout({ children }) {
             <Header />
             {children}
             <Overlays />
+            <TryOnRoot />
             <Cursor />
             <Sound />
             <div className="ambience" aria-hidden />

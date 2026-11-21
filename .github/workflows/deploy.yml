@@ -1,4 +1,4 @@
-# Builds the static site and publishes it to GitHub Pages on every push to main.
+﻿# Builds the static site and publishes it to GitHub Pages on every push to main.
 # One-time setup: repo Settings -> Pages -> Source: "GitHub Actions".
 name: Deploy to GitHub Pages
 
@@ -29,6 +29,8 @@ jobs:
       - name: Build static export
         run: npm run build
         env:
+          # live try-on token service (repo Settings → Secrets and variables → Actions → Variables)
+          NEXT_PUBLIC_TRYON_TOKEN_URL: ${{ vars.TRYON_TOKEN_URL }}
           # A <user>.github.io repo is served from the root; any other repo from /<repo>/
           NEXT_PUBLIC_BASE_PATH: ${{ endsWith(github.event.repository.name, '.github.io') && '' || format('/{0}', github.event.repository.name) }}
       - run: touch out/.nojekyll
