@@ -166,13 +166,27 @@ html[data-mood="bridal"] .ambience { background: radial-gradient(circle at 50% 4
     scale(calc(1 + (var(--rs) - 1) * var(--fs)));
 }
 /* Boutique hero: ground colours sampled from the scene image; the image's edges are masked into it */
-.hb-ground { background: linear-gradient(180deg, #a583cf 0%, #ae8ed2 30%, #b695da 62%, #c39ce5 100%); }
+/* a deeper amethyst behind the copy (white text needs it), easing into the scene's own lavender by mid-screen */
+.hb-ground {
+  background:
+    radial-gradient(ellipse 60% 75% at 12% 48%, rgba(74, 42, 138, .5), transparent 70%),
+    linear-gradient(90deg, rgba(70, 40, 130, .38) 0%, rgba(70, 40, 130, .16) 32%, transparent 52%),
+    linear-gradient(180deg, #a583cf 0%, #ae8ed2 30%, #b695da 62%, #c39ce5 100%);
+}
 .hb-art {
   -webkit-mask-image: linear-gradient(90deg, transparent, #000 13%, #000 90%, transparent), linear-gradient(180deg, transparent, #000 12%);
   mask-image: linear-gradient(90deg, transparent, #000 13%, #000 90%, transparent), linear-gradient(180deg, transparent, #000 12%);
   -webkit-mask-composite: source-in;
   mask-composite: intersect;
 }
+/* hero: pearls twinkle, the scroll cue's line drops (transform/opacity only) */
+@keyframes hb-twinkle { 0%, 100% { opacity: 0; transform: scale(.5); } 50% { opacity: 1; transform: scale(1); } }
+@keyframes hb-drop { 0% { transform: translateY(-100%); } 100% { transform: translateY(200%); } }
+@keyframes hb-wheel { 0% { opacity: 0; transform: translateY(0); } 30% { opacity: 1; } 100% { opacity: 0; transform: translateY(9px); } }
+.hb-wheel { animation: hb-wheel 1.8s ease-in-out infinite; }
+.hb-twinkle { opacity: 0; animation: hb-twinkle 4s ease-in-out infinite; will-change: opacity, transform; }
+.hb-drop { animation: hb-drop 1.8s ease-in-out infinite; }
+@media (prefers-reduced-motion: reduce) { .hb-twinkle { animation: none; opacity: .5; } .hb-drop { animation: none; } }
 .hx2-ground { background: radial-gradient(ellipse 70% 80% at 62% 42%, #b09bdc 0%, #9179c8 38%, #7557b0 72%, #5f4397 100%); }
 /* block wordmarks: pearl on amethyst, with the soft drop the reference film uses */
 .block-word { font-family: var(--font-wide), var(--font-sans); font-weight: 900; text-transform: uppercase; letter-spacing: -0.035em; line-height: 0.88; }
