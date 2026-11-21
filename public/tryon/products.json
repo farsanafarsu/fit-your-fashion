@@ -1,42 +1,72 @@
-﻿[
+[
     {
-        "name":  "Aurora Bias Gown",
-        "id":  "aurora-gown",
-        "image":  "/products/aurora-gown.webp"
+        "name": "Aurora Bias Gown",
+        "id": "aurora-gown",
+        "image": "/products/aurora-gown.webp"
     },
     {
-        "name":  "Lune Slip Dress",
-        "id":  "lune-slip",
-        "image":  "/products/lune-slip.webp"
+        "name": "Lune Slip Dress",
+        "id": "lune-slip",
+        "image": "/products/lune-slip.webp"
     },
     {
-        "name":  "Mist Drape Saree Gown",
-        "id":  "mist-drape",
-        "image":  "/products/mist-drape.webp"
+        "name": "Mist Drape Saree Gown",
+        "id": "mist-drape",
+        "image": "/products/mist-drape.webp"
     },
     {
-        "name":  "Halo Organza Cape",
-        "id":  "halo-cape",
-        "image":  "/products/halo-cape.webp"
+        "name": "Halo Organza Cape",
+        "id": "halo-cape",
+        "image": "/products/halo-cape.webp"
     },
     {
-        "name":  "Nocturne Sculpted Blazer",
-        "id":  "nocturne-blazer",
-        "image":  "/products/nocturne-blazer.webp"
+        "name": "Nocturne Sculpted Blazer",
+        "id": "nocturne-blazer",
+        "image": "/products/nocturne-blazer.webp"
     },
     {
-        "name":  "Vesper Wide Trouser",
-        "id":  "vesper-trouser",
-        "image":  "/products/vesper-trouser.webp"
+        "name": "Vesper Wide Trouser",
+        "id": "vesper-trouser",
+        "image": "/products/vesper-trouser.webp"
     },
     {
-        "name":  "Cloud Knit Top",
-        "id":  "cloud-knit",
-        "image":  "/products/cloud-knit.webp"
+        "name": "Cloud Knit Top",
+        "id": "cloud-knit",
+        "image": "/products/cloud-knit.webp"
     },
     {
-        "name":  "Orbit Pleated Skirt",
-        "id":  "orbit-skirt",
-        "image":  "/products/orbit-skirt.webp"
+        "name": "Orbit Pleated Skirt",
+        "id": "orbit-skirt",
+        "image": "/products/orbit-skirt.webp"
+    },
+    {
+        "name": "Noir Constellation Gown",
+        "id": "noir-constellation-gown",
+        "image": "/products/noir-constellation-gown.webp"
+    },
+    {
+        "name": "Rani Cape Drape Set",
+        "id": "rani-cape-drape",
+        "image": "/products/rani-cape-drape.webp"
+    },
+    {
+        "name": "Marigold Pre-Draped Saree",
+        "id": "marigold-drape-saree",
+        "image": "/products/marigold-drape-saree.webp"
+    },
+    {
+        "name": "Garnet Beaded Saree",
+        "id": "garnet-beaded-saree",
+        "image": "/products/garnet-beaded-saree.webp"
+    },
+    {
+        "name": "Hearth Corset Dress",
+        "id": "hearth-corset-dress",
+        "image": "/products/hearth-corset-dress.webp"
+    },
+    {
+        "name": "Rosebriar Prairie Dress",
+        "id": "rosebriar-prairie-dress",
+        "image": "/products/rosebriar-prairie-dress.webp"
     }
 ]
