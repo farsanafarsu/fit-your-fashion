@@ -31,7 +31,7 @@ export default function Moods() {
             return (
               <a
                 key={m.id}
-                href={`/dressing-room?mood=${m.id}`}
+                href={`${process.env.NEXT_PUBLIC_BASE_PATH || ""}/dressing-room/?mood=${m.id}`}
                 data-cursor="Feel"
                 onPointerDown={(e) => (pointer.current = e.pointerType)}
                 onPointerEnter={(e) => { if (e.pointerType !== "mouse") return; setMood(m.id); noteMood(m.id, 0.3); }}
