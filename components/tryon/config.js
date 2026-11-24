@@ -1,28 +1,36 @@
-// ─── Live try-on settings ────────────────────────────────────────────────────
-// The one switch: false hides every "Try it on" button and never loads the camera or Decart's SDK.
-const TRYON_SWITCH = true;
+// ─── Photo try-on settings ───────────────────────────────────────────────────
+// The one switch: false hides every "Try it on" button and never loads the try-on code.
+export const TRYON_ENABLED = true;
 
-// Where the browser asks for a short-lived Decart client token. Your API key lives only on that
-// server (see tryon-api/). Set NEXT_PUBLIC_TRYON_TOKEN_URL at build time, e.g.
-// https://fit-your-fashion-tryon.vercel.app/api/tryon-token
-export const TOKEN_URL = process.env.NEXT_PUBLIC_TRYON_TOKEN_URL || "";
+// The Hugging Face Space that makes the try-on picture (FASHN VTON v1.5, Apache-2.0).
+// Default: the official public Space, free to call. Each visitor uses their own small daily GPU allowance there.
+// Your own Space (hf-space/ folder): set NEXT_PUBLIC_TRYON_SPACE=your-username/your-space at build time.
+export const SPACE = process.env.NEXT_PUBLIC_TRYON_SPACE || "fashn-ai/fashn-vton-1.5";
+export const ENDPOINT = "/try_on";
 
-// Buttons only appear once a token service is configured, so the live site never shows a try-on
-// that can only fail.
-export const TRYON_ENABLED = TRYON_SWITCH && Boolean(TOKEN_URL);
+// Quality vs speed: 20 fast, 30 balanced, 50 best. Fewer steps = more try-ons per visitor's daily GPU allowance.
+export const TIMESTEPS = 30;
+export const GUIDANCE = 1.5;
+export const PHOTO_MAX_SIDE = 1024; // the person photo is shrunk to this before upload
 
-export const MODEL = "lucy-vton-latest"; // Decart's realtime virtual try-on model (docs + SDK 0.2.14)
-export const SESSION_SECONDS = 180; // 3 minutes; the token service also enforces this on Decart's side
-
-// Products for the strip under the video. Edit public/tryon/products.json.
+// Products for the strip under the picture. Edit public/tryon/products.json
+// ("category": "tops" | "bottoms" | "one-pieces").
 const BASE = process.env.NEXT_PUBLIC_BASE_PATH || "";
 export const PRODUCTS_URL = `${BASE}/tryon/products.json`;
 // Site-relative paths like /products/x.webp need the GitHub Pages prefix; full URLs pass through.
 export const assetUrl = (src) => (src?.startsWith("/") && !src.startsWith("//") ? `${BASE}${src}` : src);
 
+// The model needs to know which part of the outfit to replace. Used when a product has no "category".
+export function guessCategory(name = "") {
+  const n = name.toLowerCase();
+  if (/trouser|pant|jean|skirt|short|legging|palazzo/.test(n)) return "bottoms";
+  if (/top|shirt|blouse|blazer|jacket|coat|cape|knit|sweater|tee|kurta|cardigan/.test(n)) return "tops";
+  return "one-pieces"; // dresses, gowns, sarees, jumpsuits, sets
+}
+
 // ─── Analytics: every try-on event goes through here ─────────────────────────
-// Events: tryon_opened, tryon_started, tryon_live, tryon_swapped, tryon_snapshot, tryon_add_to_cart,
-// tryon_ended, tryon_error. Point it at Google Analytics or Meta Pixel when you're ready, e.g.
+// Events: tryon_opened, tryon_photo_added, tryon_started, tryon_done, tryon_swapped, tryon_download,
+// tryon_add_to_cart, tryon_error. Point it at Google Analytics or Meta Pixel when you're ready, e.g.
 //   window.gtag?.("event", name, data);
 //   window.fbq?.("trackCustom", name, data);
 export function track(name, data = {}) {

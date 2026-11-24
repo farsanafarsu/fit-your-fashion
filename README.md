@@ -38,7 +38,7 @@ Next.js (App Router) · React · Tailwind CSS v4 · GSAP + ScrollTrigger · Leni
 
 ## Privacy
 
-Photos, scans and the webcam stream are processed in the browser and never uploaded in this prototype. Measurements are stored only in `localStorage` and can be deleted from the dressing room. Shared look links contain garment IDs only.
+Photos, scans and the webcam stream are processed in the browser and never uploaded, except in **Try it on**: after the shopper agrees, their photo is sent to the try-on model on Hugging Face to make the picture (see `TRYON.md`). It is kept in memory only for that page visit. Measurements are stored only in `localStorage` and can be deleted from the dressing room. Shared look links contain garment IDs only.
 
 ## Accessibility & motion
 

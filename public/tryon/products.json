@@ -2,71 +2,85 @@
     {
         "name": "Aurora Bias Gown",
         "id": "aurora-gown",
-        "image": "/products/aurora-gown.webp"
+        "image": "/products/aurora-gown.webp",
+        "category": "one-pieces"
     },
     {
         "name": "Lune Slip Dress",
         "id": "lune-slip",
-        "image": "/products/lune-slip.webp"
+        "image": "/products/lune-slip.webp",
+        "category": "one-pieces"
     },
     {
         "name": "Mist Drape Saree Gown",
         "id": "mist-drape",
-        "image": "/products/mist-drape.webp"
+        "image": "/products/mist-drape.webp",
+        "category": "one-pieces"
     },
     {
         "name": "Halo Organza Cape",
         "id": "halo-cape",
-        "image": "/products/halo-cape.webp"
+        "image": "/products/halo-cape.webp",
+        "category": "tops"
     },
     {
         "name": "Nocturne Sculpted Blazer",
         "id": "nocturne-blazer",
-        "image": "/products/nocturne-blazer.webp"
+        "image": "/products/nocturne-blazer.webp",
+        "category": "tops"
     },
     {
         "name": "Vesper Wide Trouser",
         "id": "vesper-trouser",
-        "image": "/products/vesper-trouser.webp"
+        "image": "/products/vesper-trouser.webp",
+        "category": "bottoms"
     },
     {
         "name": "Cloud Knit Top",
         "id": "cloud-knit",
-        "image": "/products/cloud-knit.webp"
+        "image": "/products/cloud-knit.webp",
+        "category": "tops"
     },
     {
         "name": "Orbit Pleated Skirt",
         "id": "orbit-skirt",
-        "image": "/products/orbit-skirt.webp"
+        "image": "/products/orbit-skirt.webp",
+        "category": "bottoms"
     },
     {
         "name": "Noir Constellation Gown",
         "id": "noir-constellation-gown",
-        "image": "/products/noir-constellation-gown.webp"
+        "image": "/products/noir-constellation-gown.webp",
+        "category": "one-pieces"
     },
     {
         "name": "Rani Cape Drape Set",
         "id": "rani-cape-drape",
-        "image": "/products/rani-cape-drape.webp"
+        "image": "/products/rani-cape-drape.webp",
+        "category": "one-pieces"
     },
     {
         "name": "Marigold Pre-Draped Saree",
         "id": "marigold-drape-saree",
-        "image": "/products/marigold-drape-saree.webp"
+        "image": "/products/marigold-drape-saree.webp",
+        "category": "one-pieces"
     },
     {
         "name": "Garnet Beaded Saree",
         "id": "garnet-beaded-saree",
-        "image": "/products/garnet-beaded-saree.webp"
+        "image": "/products/garnet-beaded-saree.webp",
+        "category": "one-pieces"
     },
     {
         "name": "Hearth Corset Dress",
         "id": "hearth-corset-dress",
-        "image": "/products/hearth-corset-dress.webp"
+        "image": "/products/hearth-corset-dress.webp",
+        "category": "one-pieces"
     },
     {
         "name": "Rosebriar Prairie Dress",
         "id": "rosebriar-prairie-dress",
-        "image": "/products/rosebriar-prairie-dress.webp"
+        "image": "/products/rosebriar-prairie-dress.webp",
+        "category": "one-pieces"
     }
 ]
