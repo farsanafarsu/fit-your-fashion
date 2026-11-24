@@ -1,4 +1,6 @@
-// ─── Photo try-on settings ───────────────────────────────────────────────────
+// ─── Try-on settings ─────────────────────────────────────────────────────────
+// Two modes: INSTANT (live camera, runs in the shopper's browser: free, unlimited, no queue)
+// and HD (a realistic AI picture from a Hugging Face Space: slower, may queue).
 // The one switch: false hides every "Try it on" button and never loads the try-on code.
 export const TRYON_ENABLED = true;
 
@@ -17,6 +19,9 @@ export const PHOTO_MAX_SIDE = 1024; // the person photo is shrunk to this before
 // ("category": "tops" | "bottoms" | "one-pieces").
 const BASE = process.env.NEXT_PUBLIC_BASE_PATH || "";
 export const PRODUCTS_URL = `${BASE}/tryon/products.json`;
+// Instant try-on cutouts (one transparent .webp per product id) and their body anchors, made by
+// scripts/make-garments.py. A product without a cutout offers only the HD AI try-on.
+export const GARMENTS_URL = `${BASE}/tryon/garments`;
 // Site-relative paths like /products/x.webp need the GitHub Pages prefix; full URLs pass through.
 export const assetUrl = (src) => (src?.startsWith("/") && !src.startsWith("//") ? `${BASE}${src}` : src);
 
@@ -29,8 +34,8 @@ export function guessCategory(name = "") {
 }
 
 // ─── Analytics: every try-on event goes through here ─────────────────────────
-// Events: tryon_opened, tryon_photo_added, tryon_started, tryon_done, tryon_swapped, tryon_download,
-// tryon_add_to_cart, tryon_error. Point it at Google Analytics or Meta Pixel when you're ready, e.g.
+// Events: tryon_opened, tryon_live, tryon_snapshot, tryon_photo_added, tryon_started, tryon_done, tryon_swapped,
+// tryon_download, tryon_add_to_cart, tryon_error. Point it at Google Analytics or Meta Pixel when you're ready, e.g.
 //   window.gtag?.("event", name, data);
 //   window.fbq?.("trackCustom", name, data);
 export function track(name, data = {}) {
